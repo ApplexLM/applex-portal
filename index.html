@@ -192,15 +192,10 @@ body:after{
     <label>Número de WhatsApp</label><input id="wa" inputmode="numeric" maxlength="10" placeholder="10 dígitos">
     <label>Estado</label><select id="state"><option value="">Selecciona tu estado</option><option>Sinaloa</option><option>Sonora</option><option>Chihuahua</option><option>Jalisco</option><option>Ciudad de México</option><option>Nuevo León</option><option>Otro estado</option></select>
     <div class="quote"><small>COTIZACIÓN ESTIMADA</small><div class="price" id="price">$3,200 MXN</div><div class="qrow"><span>Precio del servicio</span><strong id="service">$3,200 MXN</strong></div><div class="qrow"><span>Anticipo (50%)</span><strong id="deposit">$1,600 MXN</strong></div><div class="qrow"><span>Resto al finalizar</span><strong id="balance">$1,600 MXN</strong></div><div class="notice">La cotización se calcula según el modelo y la información proporcionada. Te confirmaremos los detalles por WhatsApp.</div></div>
-    <button class="btn" id="send" type="button">ENVIAR SOLICITUD &nbsp; →</button><div class="secure">🔒 Tus datos se utilizan para gestionar tu solicitud.</div>
+    <button class="btn" id="send" type="button" onclick="window.APPLEX_ENVIAR()">ENVIAR SOLICITUD &nbsp; →</button><div class="secure">🔒 Tus datos se utilizan para gestionar tu solicitud.</div>
   </div>
 </section>
 
-<section class="panel models" id="modelos">
-  <div class="modelshead"><h3>SELECCIONA TU MODELO</h3><span style="font-size:10px;color:#8299a8">Todos los modelos disponibles</span></div>
-  <div class="filters"><div class="filter active" data-filter="all">TODOS</div><div class="filter" data-filter="18">SERIE 18</div><div class="filter" data-filter="17">SERIE 17</div><div class="filter" data-filter="16">SERIE 16</div><div class="filter" data-filter="15">SERIE 15</div><div class="filter" data-filter="14">SERIE 14</div><div class="filter" data-filter="13">SERIE 13</div><div class="filter" data-filter="old">ANTERIORES</div></div>
-  <div class="modelgrid" id="modelgrid"></div>
-</section>
 
 <section class="panel how" id="como">
 <h3>¿CÓMO FUNCIONA?</h3>
@@ -224,12 +219,27 @@ body:after{
 
 
 
-<button type="button" style="
+<style>
+@keyframes applexFacebookPulse {
+  0%,100% { transform:translateY(0) scale(1); box-shadow:0 12px 35px rgba(24,119,242,.28); }
+  50% { transform:translateY(-4px) scale(1.035); box-shadow:0 16px 42px rgba(24,119,242,.48); }
+}
+@keyframes applexFacebookFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-3px); }
+}
+</style>
+<button type="button" onclick="window.open('https://www.facebook.com/share/1Jmr4yAXVA/?mibextid=wwXIfr','_blank')" style="
 position:fixed;right:24px;bottom:24px;z-index:9999;
 border:0;border-radius:16px;padding:15px 22px;
 font-weight:800;letter-spacing:.2px;cursor:pointer;
-background:#25D366;color:#071018;box-shadow:0 12px 35px rgba(37,211,102,.28);
-">Solicitar por WhatsApp</button>
+background:#1877F2;color:#fff;box-shadow:0 12px 35px rgba(24,119,242,.28);
+display:flex;align-items:center;gap:10px;
+animation:applexFacebookPulse 2.2s ease-in-out infinite;
+">
+<span style="font-family:Arial,sans-serif;font-size:22px;font-weight:900;line-height:1;animation:applexFacebookFloat 1.5s ease-in-out infinite;">f</span>
+<span>APPLEX</span>
+</button>
 
 
 
@@ -453,5 +463,84 @@ update();
 })();
 </script>
 
+
+<script>
+window.APPLEX_ENVIAR = async function(){
+  const btn=document.getElementById("send");
+  btn.disabled=true;
+  const original=btn.innerHTML;
+  btn.innerHTML="PROCESANDO…";
+  try{
+    const model=document.getElementById("model").value;
+    const imei=document.getElementById("imei").value.trim();
+    const nombre=document.getElementById("name").value.trim();
+    const whatsapp=document.getElementById("wa").value.trim();
+    const estado=document.getElementById("state").value;
+    const deuda=!!document.querySelector('[data-debt="yes"].active');
+
+    if(!model) throw new Error("Selecciona el modelo.");
+    if(imei.length!==15) throw new Error("El IMEI debe tener 15 dígitos.");
+    if(!nombre) throw new Error("Escribe tu nombre.");
+    if(whatsapp.length!==10) throw new Error("El WhatsApp debe tener 10 dígitos.");
+    if(!estado) throw new Error("Selecciona tu estado.");
+
+    const prices={
+      "iPhone 11":800,"iPhone 11 Pro":900,"iPhone 11 Pro Max":1000,"iPhone 12":1100,
+      "iPhone 12 Pro":1250,"iPhone 12 Pro Max":1400,"iPhone 13":1400,"iPhone 13 mini":1400,
+      "iPhone 13 Pro":1600,"iPhone 13 Pro Max":1800,"iPhone 14":1800,"iPhone 14 Plus":1900,
+      "iPhone 14 Pro":2100,"iPhone 14 Pro Max":2300,"iPhone 15":2200,"iPhone 15 Plus":2300,
+      "iPhone 15 Pro":2500,"iPhone 15 Pro Max":2700,"iPhone 16":2600,"iPhone 16 Plus":2700,
+      "iPhone 16 Pro":2900,"iPhone 16 Pro Max":3200,"iPhone 17":3100,"iPhone 17 Air":3200,
+      "iPhone 17 Pro":3500,"iPhone 17 Pro Max":3800,"iPhone 18 Pro":4300,"iPhone 18 Pro Max":4900
+    };
+    const precio=prices[model]+(deuda?100:0);
+    const folio="APP-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+String(Date.now()).slice(-6);
+
+    const payload={
+      folio,nombre,whatsapp,imei,modelo:model,
+      deuda_mayor_1_mes:deuda,precio,anticipo:Math.round(precio/2),
+      estado:"Solicitud recibida"
+    };
+
+    const response=await fetch(
+      "https://owjzoliqpjxnrhexrcqz.supabase.co/rest/v1/solicitudes",
+      {
+        method:"POST",
+        headers:{
+          "apikey":"sb_publishable_GfCVRij21dvZchfbhAyz_g_5RVaZlOS",
+          "Authorization":"Bearer sb_publishable_GfCVRij21dvZchfbhAyz_g_5RVaZlOS",
+          "Content-Type":"application/json",
+          "Prefer":"return=minimal"
+        },
+        body:JSON.stringify(payload)
+      }
+    );
+
+    if(!response.ok){
+      const error=await response.text();
+      throw new Error("Supabase: "+error);
+    }
+
+    const message=`Hola APPLEX 👋
+
+Quiero solicitar la liberación de mi iPhone.
+
+Folio: ${folio}
+Modelo: ${model}
+IMEI: ${imei}
+Nombre: ${nombre}
+WhatsApp: ${whatsapp}
+Cotización: $${precio.toLocaleString("es-MX")} MXN
+Anticipo: $${Math.round(precio/2).toLocaleString("es-MX")} MXN`;
+
+    window.location.href="https://wa.me/526981174826?text="+encodeURIComponent(message);
+
+  }catch(error){
+    alert(error.message || "Ocurrió un error.");
+    btn.disabled=false;
+    btn.innerHTML=original;
+  }
+};
+</script>
 
 </body></html>
