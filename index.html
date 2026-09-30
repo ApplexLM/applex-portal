@@ -104,6 +104,7 @@ body:after{
 .real-product-caption span{display:block;margin-top:4px;color:#b6c8d4;font-size:11px}
 .real-product-note{text-align:center;color:#617a8a;font-size:8px;margin-top:8px}
 @media(max-width:720px){.real-product-stage{height:330px}.real-iphone{height:315px;max-width:96%}}
+.real-product.image-error .real-product-stage:after{content:"Imagen del equipo no disponible";position:absolute;z-index:3;color:#7892a2;font-size:11px;border:1px solid #29485c;border-radius:10px;padding:10px 14px;background:#061019dd}
 </style>
 </head>
 <body>
@@ -402,7 +403,10 @@ function appleImageUrl(model,color){
   const f=(finish[model]||{})[color];
   const base=(specs[model]||[])[0];
   if(!f||!base)return "";
-  return "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/"+base+"-"+f+"?wid=800&hei=1000&fmt=png-alpha";
+  // Apple usa los nombres de acabado sin guiones en estos assets (ej. whitetitanium).
+  // La versión anterior generaba URLs inexistentes y por eso aparecía el icono de imagen rota.
+  const finishToken=f.replace(/-/g,"");
+  return "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/"+base+"-"+finishToken+"?wid=1200&hei=1500&fmt=png-alpha";
 }
 function setRealProduct(model,color){
   const img=$("realIphone");
@@ -411,7 +415,13 @@ function setRealProduct(model,color){
   img.classList.add("loading");
   img.alt=model+" — "+color;
   img.onload=()=>img.classList.remove("loading");
-  img.onerror=()=>{img.classList.remove("loading"); img.alt=model+" — "+color;};
+  img.onerror=()=>{
+    img.classList.remove("loading");
+    img.removeAttribute("src");
+    img.alt="Imagen no disponible";
+    $("realProduct").classList.add("image-error");
+  };
+  img.onload=()=>$("realProduct").classList.remove("image-error");
   img.src=url;
   $("heroModel").textContent=model;
   $("heroColor").textContent=color;
