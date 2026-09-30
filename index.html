@@ -120,6 +120,15 @@ body:after{
 .device-3d.family-15 .phone-front .notch,.device-3d.family-16 .phone-front .notch,.device-3d.family-17 .phone-front .notch,.device-3d.family-18 .phone-front .notch{display:none}
 .device-3d.family-15 .phone-front .island,.device-3d.family-16 .phone-front .island,.device-3d.family-17 .phone-front .island,.device-3d.family-18 .phone-front .island{display:block}
 .device-3d.mini{height:340px;width:235px}.device-3d.max{height:420px;width:285px}
+.official-viewer{position:relative;z-index:3;width:min(94%,760px);height:470px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:28px;background:radial-gradient(ellipse at 50% 50%,rgba(20,150,220,.16),rgba(2,13,22,.02) 55%,transparent 78%)}
+.official-viewer:before{content:"";position:absolute;width:62%;height:13%;bottom:9%;border-radius:50%;background:radial-gradient(ellipse,rgba(24,201,255,.38),rgba(24,112,255,.12) 45%,transparent 75%);filter:blur(22px)}
+.official-viewer img{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;object-position:center;mix-blend-mode:screen;filter:drop-shadow(0 34px 34px rgba(0,0,0,.7)) drop-shadow(0 0 28px rgba(0,190,255,.16));transform:scale(1.12);transition:transform .45s ease,filter .45s ease}
+.official-viewer img.color-dark{filter:brightness(.82) contrast(1.08) saturate(.9) drop-shadow(0 34px 34px rgba(0,0,0,.72)) drop-shadow(0 0 28px rgba(0,190,255,.15))}
+.official-viewer img.color-blue{filter:saturate(1.25) hue-rotate(5deg) drop-shadow(0 34px 34px rgba(0,0,0,.72)) drop-shadow(0 0 28px rgba(40,130,255,.2))}
+.official-viewer img.color-light{filter:brightness(1.06) contrast(1.02) drop-shadow(0 34px 34px rgba(0,0,0,.7)) drop-shadow(0 0 28px rgba(150,220,255,.16))}
+.official-viewer img.color-desert{filter:saturate(.9) sepia(.12) hue-rotate(350deg) drop-shadow(0 34px 34px rgba(0,0,0,.7)) drop-shadow(0 0 28px rgba(255,190,130,.16))}
+.real-product-stage .device-3d{display:none}
+@media(max-width:720px){.official-viewer{height:500px;width:100%}.official-viewer img{transform:scale(1.18)}}
 .real-product-caption{text-align:center;margin-top:2px}.real-product-caption strong{display:block;font-size:18px;letter-spacing:.1px}.real-product-caption span{display:block;margin-top:4px;color:#b6c8d4;font-size:12px}.real-product-note{text-align:center;color:#617a8a;font-size:8px;margin-top:8px}
 @media(max-width:720px){.real-product-stage{height:470px}.device-3d{width:250px;height:370px;transform:rotateY(-13deg) rotateX(3deg) rotateZ(-2deg) scale(1.05)}.device-3d.max{height:400px;width:270px}.device-3d.mini{height:325px;width:225px}}
 </style>
@@ -190,15 +199,10 @@ body:after{
       <div class="real-product-head"><span>VISTA DEL EQUIPO SELECCIONADO</span><span class="real-product-dot"></span></div>
       <div class="real-product-stage">
         <div class="real-product-glow"></div>
-        <div id="device3d" class="device-3d family-pro">
-          <div class="phone-back">
-            <div class="camera"><span class="lens l1"></span><span class="lens l2"></span><span class="lens l3"></span><span class="flash"></span><span class="sensor"></span></div>
-            <div class="logo-mark">●</div>
-          </div>
-          <div class="phone-front">
-            <div class="screen"></div><div class="island"></div><div class="notch"></div>
-          </div>
+        <div class="official-viewer">
+          <img id="officialProduct" alt="iPhone seleccionado" src="https://www.apple.com/newsroom/images/2023/09/apple-unveils-iphone-15-pro-and-iphone-15-pro-max/article/Apple-iPhone-15-Pro-lineup-hero-230912_Full-Bleed-Image.jpg.large.jpg">
         </div>
+        <div id="device3d" class="device-3d family-pro" aria-hidden="true"></div>
       </div>
       <div class="real-product-caption"><strong id="heroModel">iPhone 16 Pro Max</strong><span id="heroColor">Titanio negro</span></div>
       <div class="real-product-note">Imagen de producto correspondiente al modelo y color seleccionado.</div>
@@ -366,6 +370,21 @@ function renderColors(model){
 }
 function setRealProduct(model,color){
   const d=$("device3d"); if(!d)return;
+  const img=$("officialProduct");
+  if(img){
+    const key=(model||"").toLowerCase();
+    let src="https://www.apple.com/newsroom/images/2023/09/apple-unveils-iphone-15-pro-and-iphone-15-pro-max/article/Apple-iPhone-15-Pro-lineup-hero-230912_Full-Bleed-Image.jpg.large.jpg";
+    if(key.includes("16 pro")){
+      src="https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/refurb-iphone-16-pro-whitetitanium-202509?fmt=png-alpha&hei=1200&wid=1200";
+    }
+    img.src=src;
+    img.alt=model+" — "+color;
+    img.className="";
+    if(/negro|espacial|grafito|medianoche/i.test(color)) img.classList.add("color-dark");
+    else if(/azul|ultramarino/i.test(color)) img.classList.add("color-blue");
+    else if(/blanco|plata|glaciar|estelar/i.test(color)) img.classList.add("color-light");
+    else if(/desierto|oro/i.test(color)) img.classList.add("color-desert");
+  }
   d.className="device-3d";
   const n=(model||"").toLowerCase();
   let family="base";
