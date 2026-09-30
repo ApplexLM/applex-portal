@@ -443,7 +443,7 @@ $("send").addEventListener("click",async function(e){
  const data={folio,nombre:name,whatsapp:wa,imei,modelo:m,deuda_mayor_1_mes:debt,precio:price,anticipo:Math.round(price/2),estado:"Solicitud recibida"};
  const btn=$("send"), old=btn.textContent; btn.disabled=true; btn.textContent="GUARDANDO…";
  try{
-  const r=await fetch(SUPA+"/rest/v1/solicitudes",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(data)});
+  const r=await fetch(SUPA+"/rest/v1/solicitudes",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(data)});
   if(!r.ok){const t=await r.text();throw new Error(t||"Supabase rechazó la solicitud.");}
   const msg=`Hola APPLEX 👋\n\nQuiero solicitar la liberación de mi iPhone.\n\nFolio: ${folio}\nModelo: ${m}\nIMEI: ${imei}\nNombre: ${name}\nWhatsApp: ${wa}\nCotización: ${money(price)}\nAnticipo (50%): ${money(price/2)}`;
   window.location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
