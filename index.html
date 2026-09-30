@@ -90,22 +90,38 @@ body:after{
 .swatch{width:18px;height:18px;border-radius:50%;border:1px solid #ffffff66;box-shadow:inset 0 0 5px #0006,0 0 4px #0005}
 .selectedcolor{font-size:9px;color:#7892a2;margin-top:6px}
 
-/* V25 — PRODUCTO PREMIUM / SIN RECTANGULO DURO */
-.intro>.showcase{display:none!important}
+/* V28 — RENDER 3D DINAMICO POR MODELO Y COLOR */
 .real-product{margin:20px 0 4px;border-top:1px solid rgba(39,202,255,.16);padding-top:15px}
 .real-product-head{display:flex;align-items:center;justify-content:space-between;color:#27caff;font-size:10px;font-weight:850;letter-spacing:1.6px}
 .real-product-dot{width:7px;height:7px;border-radius:50%;background:#20d7ff;box-shadow:0 0 14px #20d7ff}
-.real-product-stage{position:relative;height:500px;margin:2px auto 0;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:26px;background:radial-gradient(ellipse at center,rgba(11,62,84,.30) 0%,rgba(4,17,27,.10) 42%,transparent 72%)}
-.real-product-stage:before{content:"";position:absolute;left:14%;right:14%;bottom:9%;height:18%;border-radius:50%;background:radial-gradient(ellipse,rgba(20,198,255,.30),rgba(20,120,255,.12) 42%,transparent 72%);filter:blur(18px);transform:perspective(300px) rotateX(55deg)}
-.real-product-glow{position:absolute;width:88%;height:70%;border-radius:50%;background:radial-gradient(ellipse,rgba(16,190,255,.16),rgba(16,120,255,.055) 42%,transparent 72%);filter:blur(15px)}
-.real-iphone{position:relative;z-index:2;width:auto;height:680px;max-width:none;object-fit:contain;display:block;transform:scale(1.08);mix-blend-mode:multiply;filter:drop-shadow(0 34px 34px rgba(0,0,0,.72)) drop-shadow(0 0 26px rgba(0,190,255,.13)) contrast(1.08);transition:opacity .18s ease,transform .35s ease}
-.real-iphone.loading{opacity:.12;transform:scale(1.35)}
-.real-product-caption{text-align:center;margin-top:6px}
-.real-product-caption strong{display:block;font-size:16px;letter-spacing:.1px}
-.real-product-caption span{display:block;margin-top:4px;color:#b6c8d4;font-size:11px}
-.real-product-note{text-align:center;color:#617a8a;font-size:8px;margin-top:8px}
-@media(max-width:720px){.real-product-stage{height:500px;border-radius:22px}.real-iphone{height:700px;transform:scale(1.08)}.real-iphone.loading{transform:scale(1.04)}}
-.real-product.image-error .real-product-stage:after{content:"Imagen del equipo no disponible";position:absolute;z-index:3;color:#7892a2;font-size:11px;border:1px solid #29485c;border-radius:10px;padding:10px 14px;background:#061019dd}
+.real-product-stage{position:relative;height:500px;margin:2px auto 0;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:26px;background:radial-gradient(ellipse at 50% 46%,rgba(9,92,125,.25),rgba(4,17,27,.05) 48%,transparent 76%)}
+.real-product-stage:before{content:"";position:absolute;left:10%;right:10%;bottom:9%;height:16%;border-radius:50%;background:radial-gradient(ellipse,rgba(20,210,255,.38),rgba(20,120,255,.10) 45%,transparent 74%);filter:blur(20px);transform:perspective(300px) rotateX(55deg)}
+.real-product-glow{position:absolute;width:76%;height:68%;border-radius:50%;background:radial-gradient(ellipse,rgba(16,190,255,.18),rgba(16,120,255,.05) 45%,transparent 72%);filter:blur(22px)}
+.device-3d{--device:#252a30;--device2:#111820;--accent:#dce7ef;position:relative;z-index:2;width:270px;height:390px;transform:rotateY(-13deg) rotateX(3deg) rotateZ(-2deg);transform-style:preserve-3d;transition:.45s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 34px 28px rgba(0,0,0,.65)) drop-shadow(0 0 26px rgba(0,190,255,.16))}
+.device-3d .phone-back,.device-3d .phone-front{position:absolute;inset:0;border-radius:42px;border:2px solid rgba(255,255,255,.24);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.28),inset -8px -10px 24px rgba(0,0,0,.34),inset 7px 7px 22px rgba(255,255,255,.12)}
+.device-3d .phone-back{background:linear-gradient(135deg,var(--accent),var(--device) 28%,var(--device2) 80%,#05080b);transform:translateZ(-12px)}
+.device-3d .phone-front{background:linear-gradient(145deg,#111820,#020408 65%);transform:translate(34px,8px) translateZ(18px);width:86%;height:96%;border-radius:39px}
+.device-3d .side{position:absolute;left:-7px;top:25%;width:8px;height:35%;border-radius:8px;background:linear-gradient(#8796a0,#303941 40%,#8796a0);box-shadow:0 0 4px #000;transform:translateZ(-1px)}
+.device-3d .camera{position:absolute;top:25px;left:24px;width:102px;height:108px;border-radius:27px;background:linear-gradient(145deg,#263039,#070b0e);box-shadow:inset 0 0 0 2px #66747d55,0 10px 20px #0008}
+.device-3d .lens{position:absolute;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8195a4 0 7%,#25313c 9% 23%,#070b0f 35% 64%,#44535e 68% 74%,#06090c 76%);box-shadow:inset 0 0 6px #000,0 2px 5px #0008}
+.device-3d .lens.l1{left:12px;top:12px}.device-3d .lens.l2{right:12px;top:12px}.device-3d .lens.l3{left:12px;bottom:12px}
+.device-3d .flash{position:absolute;right:15px;bottom:18px;width:10px;height:10px;border-radius:50%;background:#f6f0d0;box-shadow:0 0 8px #fff8}
+.device-3d .sensor{position:absolute;right:15px;bottom:36px;width:9px;height:9px;border-radius:50%;background:#050709;border:1px solid #53616a}
+.device-3d .logo-mark{position:absolute;left:50%;top:57%;transform:translate(-50%,-50%);font-size:45px;color:#ffffff22;font-weight:300;line-height:1}
+.device-3d .screen{position:absolute;inset:7px;border-radius:34px;background:radial-gradient(circle at 75% 20%,rgba(30,190,255,.45),transparent 24%),radial-gradient(circle at 20% 80%,rgba(30,80,255,.35),transparent 28%),linear-gradient(145deg,#081522,#020408 72%);overflow:hidden}
+.device-3d .screen:after{content:"";position:absolute;inset:-20%;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 48%,transparent 55%);transform:rotate(9deg)}
+.device-3d .island{position:absolute;z-index:2;top:10px;left:50%;transform:translateX(-50%);width:67px;height:20px;border-radius:20px;background:#000;box-shadow:0 2px 5px #0008}
+.device-3d .notch{position:absolute;z-index:2;top:0;left:50%;transform:translateX(-50%);width:100px;height:27px;border-radius:0 0 18px 18px;background:#000}
+.device-3d.family-base .camera{width:94px;height:94px}.device-3d.family-base .lens.l3{display:none}
+.device-3d.family-pro .camera{width:108px;height:116px}.device-3d.family-pro .lens{width:33px;height:33px}
+.device-3d.family-pro .lens.l3{display:block}
+.device-3d.family-11 .phone-front .island,.device-3d.family-12 .phone-front .island,.device-3d.family-13 .phone-front .island,.device-3d.family-14 .phone-front .island{display:none}
+.device-3d.family-11 .phone-front .notch,.device-3d.family-12 .phone-front .notch,.device-3d.family-13 .phone-front .notch,.device-3d.family-14 .phone-front .notch{display:block}
+.device-3d.family-15 .phone-front .notch,.device-3d.family-16 .phone-front .notch,.device-3d.family-17 .phone-front .notch,.device-3d.family-18 .phone-front .notch{display:none}
+.device-3d.family-15 .phone-front .island,.device-3d.family-16 .phone-front .island,.device-3d.family-17 .phone-front .island,.device-3d.family-18 .phone-front .island{display:block}
+.device-3d.mini{height:340px;width:235px}.device-3d.max{height:420px;width:285px}
+.real-product-caption{text-align:center;margin-top:2px}.real-product-caption strong{display:block;font-size:18px;letter-spacing:.1px}.real-product-caption span{display:block;margin-top:4px;color:#b6c8d4;font-size:12px}.real-product-note{text-align:center;color:#617a8a;font-size:8px;margin-top:8px}
+@media(max-width:720px){.real-product-stage{height:470px}.device-3d{width:250px;height:370px;transform:rotateY(-13deg) rotateX(3deg) rotateZ(-2deg) scale(1.05)}.device-3d.max{height:400px;width:270px}.device-3d.mini{height:325px;width:225px}}
 </style>
 </head>
 <body>
@@ -174,7 +190,15 @@ body:after{
       <div class="real-product-head"><span>VISTA DEL EQUIPO SELECCIONADO</span><span class="real-product-dot"></span></div>
       <div class="real-product-stage">
         <div class="real-product-glow"></div>
-        <img id="realIphone" class="real-iphone" alt="iPhone seleccionado" decoding="async" fetchpriority="high">
+        <div id="device3d" class="device-3d family-pro">
+          <div class="phone-back">
+            <div class="camera"><span class="lens l1"></span><span class="lens l2"></span><span class="lens l3"></span><span class="flash"></span><span class="sensor"></span></div>
+            <div class="logo-mark">●</div>
+          </div>
+          <div class="phone-front">
+            <div class="screen"></div><div class="island"></div><div class="notch"></div>
+          </div>
+        </div>
       </div>
       <div class="real-product-caption"><strong id="heroModel">iPhone 16 Pro Max</strong><span id="heroColor">Titanio negro</span></div>
       <div class="real-product-note">Imagen de producto correspondiente al modelo y color seleccionado.</div>
@@ -340,92 +364,38 @@ function renderColors(model){
  });
  if(COLORS[model]&&COLORS[model][0]) selectColor(COLORS[model][0],box.firstElementChild);
 }
-function appleImageUrl(model,color){
-  const finish={
-    "iPhone 11":{"Negro":"black","Blanco":"white","Verde":"green","Amarillo":"yellow","Morado":"purple","(PRODUCT)RED":"red"},
-    "iPhone 11 Pro":{"Verde noche":"midnight-green","Plata":"silver","Gris espacial":"space-gray","Oro":"gold"},
-    "iPhone 11 Pro Max":{"Verde noche":"midnight-green","Plata":"silver","Gris espacial":"space-gray","Oro":"gold"},
-    "iPhone 12":{"Negro":"black","Blanco":"white","(PRODUCT)RED":"red","Verde":"green","Azul":"blue","Morado":"purple"},
-    "iPhone 12 Pro":{"Plata":"silver","Grafito":"graphite","Oro":"gold","Azul pacífico":"pacific-blue"},
-    "iPhone 12 Pro Max":{"Plata":"silver","Grafito":"graphite","Oro":"gold","Azul pacífico":"pacific-blue"},
-    "iPhone 13":{"(PRODUCT)RED":"red","Blanco estelar":"starlight","Azul medianoche":"midnight","Azul":"blue","Rosa":"pink","Verde":"green"},
-    "iPhone 13 mini":{"(PRODUCT)RED":"red","Blanco estelar":"starlight","Azul medianoche":"midnight","Azul":"blue","Rosa":"pink","Verde":"green"},
-    "iPhone 13 Pro":{"Verde alpino":"alpine-green","Plata":"silver","Oro":"gold","Grafito":"graphite","Azul Sierra":"sierra-blue"},
-    "iPhone 13 Pro Max":{"Verde alpino":"alpine-green","Plata":"silver","Oro":"gold","Grafito":"graphite","Azul Sierra":"sierra-blue"},
-    "iPhone 14":{"Medianoche":"midnight","Blanco estelar":"starlight","(PRODUCT)RED":"red","Azul":"blue","Morado":"purple","Amarillo":"yellow"},
-    "iPhone 14 Plus":{"Medianoche":"midnight","Blanco estelar":"starlight","(PRODUCT)RED":"red","Azul":"blue","Morado":"purple","Amarillo":"yellow"},
-    "iPhone 14 Pro":{"Negro espacial":"space-black","Plata":"silver","Oro":"gold","Morado oscuro":"deep-purple"},
-    "iPhone 14 Pro Max":{"Negro espacial":"space-black","Plata":"silver","Oro":"gold","Morado oscuro":"deep-purple"},
-    "iPhone 15":{"Negro":"black","Azul":"blue","Verde":"green","Amarillo":"yellow","Rosa":"pink"},
-    "iPhone 15 Plus":{"Negro":"black","Azul":"blue","Verde":"green","Amarillo":"yellow","Rosa":"pink"},
-    "iPhone 15 Pro":{"Titanio negro":"black-titanium","Titanio blanco":"white-titanium","Titanio azul":"blue-titanium","Titanio natural":"natural-titanium"},
-    "iPhone 15 Pro Max":{"Titanio negro":"black-titanium","Titanio blanco":"white-titanium","Titanio azul":"blue-titanium","Titanio natural":"natural-titanium"},
-    "iPhone 16":{"Negro":"black","Blanco":"white","Rosa":"pink","Verde azulado":"teal","Ultramarino":"ultramarine"},
-    "iPhone 16 Plus":{"Negro":"black","Blanco":"white","Rosa":"pink","Verde azulado":"teal","Ultramarino":"ultramarine"},
-    "iPhone 16 Pro":{"Titanio negro":"black-titanium","Titanio blanco":"white-titanium","Titanio natural":"natural-titanium","Titanio del desierto":"desert-titanium"},
-    "iPhone 16 Pro Max":{"Titanio negro":"black-titanium","Titanio blanco":"white-titanium","Titanio natural":"natural-titanium","Titanio del desierto":"desert-titanium"},
-    "iPhone 17":{"Negro":"black","Blanco":"white","Azul neblina":"mist-blue","Salvia":"sage","Lavanda":"lavender"},
-    "iPhone 17 Air":{"Negro espacial":"space-black","Blanco nube":"cloud-white","Oro claro":"light-gold","Azul cielo":"sky-blue"},
-    "iPhone 17 Pro":{"Azul profundo":"deep-blue","Naranja cósmico":"cosmic-orange","Plata":"silver"},
-    "iPhone 17 Pro Max":{"Azul profundo":"deep-blue","Naranja cósmico":"cosmic-orange","Plata":"silver"},
-    "iPhone 18 Pro":{"Negro":"black","Plata":"silver","Glaciar":"glacier","Borgoña":"burgundy"},
-    "iPhone 18 Pro Max":{"Negro":"black","Plata":"silver","Glaciar":"glacier","Borgoña":"burgundy"}
-  };
-  const specs={
-    "iPhone 11":["iphone-11-finish-select-201909-6-1inch", "201909"],
-    "iPhone 11 Pro":["iphone-11-pro-finish-select-201909-5-8inch", "201909"],
-    "iPhone 11 Pro Max":["iphone-11-pro-finish-select-201909-6-5inch", "201909"],
-    "iPhone 12":["iphone-12-finish-select-202010-6-1inch", "202010"],
-    "iPhone 12 Pro":["iphone-12-pro-finish-select-202010-6-1inch", "202010"],
-    "iPhone 12 Pro Max":["iphone-12-pro-max-finish-select-202010-6-7inch", "202010"],
-    "iPhone 13":["iphone-13-finish-select-202109-6-1inch", "202109"],
-    "iPhone 13 mini":["iphone-13-mini-finish-select-202109-5-4inch", "202109"],
-    "iPhone 13 Pro":["iphone-13-pro-finish-select-202109-6-1inch", "202109"],
-    "iPhone 13 Pro Max":["iphone-13-pro-max-finish-select-202109-6-7inch", "202109"],
-    "iPhone 14":["iphone-14-finish-select-202209-6-1inch", "202209"],
-    "iPhone 14 Plus":["iphone-14-plus-finish-select-202209-6-7inch", "202209"],
-    "iPhone 14 Pro":["iphone-14-pro-finish-select-202209-6-1inch", "202209"],
-    "iPhone 14 Pro Max":["iphone-14-pro-max-finish-select-202209-6-7inch", "202209"],
-    "iPhone 15":["iphone-15-finish-select-202309-6-1inch", "202309"],
-    "iPhone 15 Plus":["iphone-15-plus-finish-select-202309-6-7inch", "202309"],
-    "iPhone 15 Pro":["iphone-15-pro-finish-select-202309-6-1inch", "202309"],
-    "iPhone 15 Pro Max":["iphone-15-pro-max-finish-select-202309-6-7inch", "202309"],
-    "iPhone 16":["iphone-16-finish-select-202409-6-1inch", "202409"],
-    "iPhone 16 Plus":["iphone-16-plus-finish-select-202409-6-7inch", "202409"],
-    "iPhone 16 Pro":["iphone-16-pro-finish-select-202409-6-3inch", "202409"],
-    "iPhone 16 Pro Max":["iphone-16-pro-max-finish-select-202409-6-9inch", "202409"],
-    "iPhone 17":["iphone-17-finish-select-202509-6-3inch", "202509"],
-    "iPhone 17 Air":["iphone-air-finish-select-202509-6-5inch", "202509"],
-    "iPhone 17 Pro":["iphone-17-pro-finish-select-202509-6-3inch", "202509"],
-    "iPhone 17 Pro Max":["iphone-17-pro-max-finish-select-202509-6-9inch", "202509"],
-    "iPhone 18 Pro":["iphone-18-pro-finish-select-202609-6-3inch", "202609"],
-    "iPhone 18 Pro Max":["iphone-18-pro-max-finish-select-202609-6-9inch", "202609"]
-  };
-  const f=(finish[model]||{})[color];
-  const base=(specs[model]||[])[0];
-  if(!f||!base)return "";
-  // Apple usa los nombres de acabado sin guiones en estos assets (ej. whitetitanium).
-  // La versión anterior generaba URLs inexistentes y por eso aparecía el icono de imagen rota.
-  const finishToken=f.replace(/-/g,"");
-  return "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/"+base+"-"+finishToken+"?wid=1200&hei=1500&fmt=png-alpha";
-}
 function setRealProduct(model,color){
-  const img=$("realIphone");
-  if(!img)return;
-  const url=appleImageUrl(model,color);
-  img.classList.add("loading");
-  img.alt=model+" — "+color;
-  img.onload=()=>img.classList.remove("loading");
-  img.onerror=()=>{
-    img.classList.remove("loading");
-    img.removeAttribute("src");
-    img.alt="Imagen no disponible";
-    $("realProduct").classList.add("image-error");
-  };
-  img.onload=()=>$("realProduct").classList.remove("image-error");
-  img.src=url;
+  const d=$("device3d"); if(!d)return;
+  d.className="device-3d";
+  const n=(model||"").toLowerCase();
+  let family="base";
+  if(n.includes("11")) family="11";
+  else if(n.includes("12")) family="12";
+  else if(n.includes("13")) family="13";
+  else if(n.includes("14")) family="14";
+  else if(n.includes("15")) family="15";
+  else if(n.includes("16")) family="16";
+  else if(n.includes("17")) family="17";
+  else if(n.includes("18")) family="18";
+  const pro=/(pro)/i.test(model);
+  d.classList.add("family-"+family, pro?"family-pro":"family-base");
+  if(/mini/i.test(model))d.classList.add("mini");
+  else if(/pro max|plus/i.test(model))d.classList.add("max");
+  const hex=hexColor(color);
+  d.style.setProperty("--device",hex);
+  d.style.setProperty("--device2",shade(hex,-55));
+  d.style.setProperty("--accent",shade(hex,55));
   $("heroModel").textContent=model;
   $("heroColor").textContent=color;
+}
+function hexColor(c){
+ const map={
+  "Negro":"#20242a","Negro espacial":"#181b20","Gris espacial":"#4b5158","Grafito":"#42484d","Plata":"#cfd5d8","Blanco":"#e7e8e8","Blanco estelar":"#eee9dc","Blanco nube":"#e8e8e5","Oro":"#d9c39a","Oro claro":"#dfc58f","Amarillo":"#f1d54d","Rosa":"#e7a5b6","Morado":"#9d7ca8","Morado oscuro":"#705477","Azul":"#7198c8","Azul pacífico":"#3d607f","Azul Sierra":"#6c8da8","Azul neblina":"#92a8b8","Azul cielo":"#88b8d4","Azul profundo":"#193b63","Ultramarino":"#315aa0","Verde":"#9db8a0","Verde alpino":"#526b57","Verde azulado":"#5d9290","Salvia":"#91a695","Naranja cósmico":"#d06a34","Titanio negro":"#3e4247","Titanio blanco":"#d8d5cc","Titanio azul":"#526f91","Titanio natural":"#8e8c86","Titanio del desierto":"#b9a48b","Negro espacial":"#1d2024","Glaciar":"#b9cbd5","Borgoña":"#5c2735","Medianoche":"#252b38","Rojo":"#b52b32","(PRODUCT)RED":"#c9333d"};
+ return map[c]||"#596773";
+}
+function shade(hex,amt){
+ let h=hex.replace('#',''); let r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+ const f=(v)=>Math.max(0,Math.min(255,v+amt)); return '#'+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 function selectColor(c,b){
  selectedColor=c;
