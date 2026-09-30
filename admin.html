@@ -25,7 +25,7 @@ window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=
 <button class="btn" id="waAction2" onclick="openQuickWhatsApp(2)">WhatsApp · seguimiento</button>
 </div>
 <div id="waActionNote" style="margin-top:9px;color:#8fa6b6;font-size:10px"></div>
-</div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'});
+</div><div class="actions" id="completionAction"></div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'});
 const precioFlow=Number(r.precio)||0;
 const advanceFlow=Number(r.anticipo_pagado ?? r.anticipo)||0;
 const finalFlow=Number(r.pago_final)||0;
@@ -132,6 +132,16 @@ function updateQuickActions(){
     note.textContent='Estado actual: '+(selected.estado||'Solicitud recibida')+
       ' · Total: '+money(precio)+' · Pagado: '+money(total)+' · Saldo: '+money(saldo);
   }
+  const ca=document.getElementById('completionAction');
+  if(ca){
+    if(saldo===0 && selected.estado!=='Terminado'){
+      ca.innerHTML='<button class="btn primary" onclick="completeAfterPayment()">✓ Marcar como Terminado</button><span style="align-self:center;color:#7dffb5;font-size:10px">Pago liquidado · saldo $0</span>';
+    }else if(selected.estado==='Terminado'){
+      ca.innerHTML='<span style="color:#7dffb5;font-size:10px;font-weight:800">✓ Servicio terminado y liquidado</span>';
+    }else{
+      ca.innerHTML='';
+    }
+  }
 }
 window.openQuickWhatsApp=(which)=>{
   if(!selected||!selected.whatsapp)return;
@@ -163,7 +173,47 @@ window.openWhatsAppMessage=()=>{
   window.open(url,'_blank');
 };
 
-window.savePayments=async()=>{if(!selected)return;const precio=Number(selected.precio)||0;const advance=Math.max(0,Number($('payAdvance').value)||0);const finalPay=Math.max(0,Number($('payFinal').value)||0);const total=advance+finalPay;const saldo=Math.max(0,precio-total);const payload={anticipo_pagado:advance,pago_final:finalPay,total_pagado:total,saldo_pendiente:saldo};if(advance>0 && !selected.fecha_anticipo)payload.fecha_anticipo=new Date().toISOString();if(finalPay>0 && !selected.fecha_pago_final)payload.fecha_pago_final=new Date().toISOString();let q=sb.from('solicitudes').update(payload);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {error}=await q;if(error){alert('No se pudieron guardar los pagos: '+error.message);return}Object.assign(selected,payload);const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);if(local)Object.assign(local,payload);render();openDetail(selected.id||selected.folio);setTimeout(()=>{if($('payMsg'))$('payMsg').textContent='Pagos guardados ✓'},50)};
+window.savePayments=async()=>{if(!selected)return;const precio=Number(selected.precio)||0;const advance=Math.max(0,Number($('payAdvance').value)||0);const finalPay=Math.max(0,Number($('payFinal').value)||0);const total=advance+finalPay;const saldo=Math.max(0,precio-total);const payload={anticipo_pagado:advance,pago_final:finalPay,total_pagado:total,saldo_pendiente:saldo};if(advance>0 && !selected.fecha_anticipo)payload.fecha_anticipo=new Date().toISOString();if(finalPay>0 && !selected.fecha_pago_final)payload.fecha_pago_final=new Date().toISOString();let q=sb.from('solicitudes').update(payload);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {error}=await q;if(error){alert('No se pudieron guardar los pagos: '+error.message);return}Object.assign(selected,payload);
+const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);
+if(local)Object.assign(local,payload);
+render();
+openDetail(selected.id||selected.folio);
+if(saldo===0 && (selected.estado==='Liberado'||selected.estado==='Pago final')){
+  setTimeout(()=>{
+    const confirmar=confirm('El saldo quedó en $0. ¿Quieres cambiar el servicio a “Terminado” ahora?');
+    if(confirmar) completeAfterPayment();
+  },120);
+}setTimeout(()=>{if($('payMsg'))$('payMsg').textContent='Pagos guardados ✓'},50)};
+
+window.completeAfterPayment=async()=>{
+  if(!selected)return;
+  const precio=Number(selected.precio)||0;
+  const advance=Number(selected.anticipo_pagado ?? selected.anticipo)||0;
+  const finalPay=Number(selected.pago_final)||0;
+  const total=Number(selected.total_pagado ?? (advance+finalPay))||0;
+  const saldo=Math.max(0,precio-total);
+  if(saldo>0){
+    alert('No se puede marcar como terminado porque todavía existe un saldo pendiente de '+money(saldo)+'.');
+    return;
+  }
+  if(selected.estado==='Terminado'){
+    return;
+  }
+  let q=sb.from('solicitudes').update({estado:'Terminado'});
+  if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);
+  const {error}=await q;
+  if(error){
+    alert('El pago quedó guardado, pero no se pudo cambiar el estado a Terminado: '+error.message);
+    return;
+  }
+  selected.estado='Terminado';
+  const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);
+  if(local)local.estado='Terminado';
+  render();
+  openDetail(selected.id||selected.folio);
+  alert('Pago liquidado. El servicio ahora está marcado como Terminado.');
+};
+
 window.saveStatus=async()=>{if(!selected)return;const estado=$('newStatus').value;const key=selected.id?{id:selected.id}:{folio:selected.folio};let q=sb.from('solicitudes').update({estado}).select('id,folio,estado').limit(1);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {data,error}=await q; if(error){alert('No se pudo actualizar: '+error.message);return}selected.estado=estado;const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);if(local)local.estado=estado;render();openDetail(selected.id||selected.folio);updateQuickActions()};
 $('search').addEventListener('input',render);$('filter').addEventListener('change',render);$('refresh').addEventListener('click',load);$('logout').addEventListener('click',async()=>{await sb.auth.signOut();showLogin()});$('loginBtn').addEventListener('click',async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password){$('loginErr').textContent='Escribe email y contraseña.';return}$('loginBtn').disabled=true;$('loginErr').textContent='';const {error}=await sb.auth.signInWithPassword({email,password});$('loginBtn').disabled=false;if(error){$('loginErr').textContent=error.message;return}showApp();await load()});$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
 $('forgotBtn').addEventListener('click',async()=>{const email=$('email').value.trim();$('loginErr').textContent='';if(!email){$('loginErr').textContent='Escribe primero tu correo.';return}$('forgotBtn').disabled=true;const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});$('forgotBtn').disabled=false;if(error){$('loginErr').textContent=error.message;return}$('loginErr').style.color='#7dffb5';$('loginErr').textContent='Te enviamos un correo para crear una nueva contraseña. Abre ese enlace desde este dispositivo.'});
