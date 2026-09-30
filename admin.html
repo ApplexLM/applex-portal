@@ -13,7 +13,15 @@ function showLogin(){ $('login').classList.remove('hidden');$('reset').classList
 async function load(){ $('tableState').classList.remove('hidden');$('tableState').textContent='Cargando solicitudes…';$('table').classList.add('hidden'); const {data,error}=await sb.from('solicitudes').select('*').order('created_at',{ascending:false}); if(error){$('tableState').textContent='Error: '+error.message;return} rows=data||[];render();}
 function render(){const q=$('search').value.trim().toLowerCase(), f=$('filter').value;const filtered=rows.filter(r=>{const hay=[r.folio,r.nombre,r.whatsapp,r.imei,r.modelo,r.estado].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!f||r.estado===f)});$('stTotal').textContent=rows.length;$('stReceived').textContent=rows.filter(r=>r.estado==='Solicitud recibida').length;$('stProcess').textContent=rows.filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado)).length;$('stDone').textContent=rows.filter(r=>r.estado==='Terminado').length;if(!filtered.length){$('tableState').classList.remove('hidden');$('tableState').textContent=rows.length?'No hay coincidencias.':'Aún no hay solicitudes.';$('table').classList.add('hidden');return}$('tableState').classList.add('hidden');$('table').classList.remove('hidden');$('tbody').innerHTML=filtered.map((r,i)=>`<tr><td><span class="folio">${esc(r.folio)}</span></td><td>${r.created_at?new Date(r.created_at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}):'—'}</td><td>${esc(r.nombre)}</td><td>${esc(r.modelo)}</td><td>${esc(r.imei)}</td><td>${esc(r.whatsapp)}</td><td class="price">${money(r.precio)}</td><td>${money(r.anticipo)}</td><td><span class="status s-${Math.max(0,STATUSES.indexOf(r.estado))}">${esc(r.estado)}</span></td><td><button class="btn" onclick="openDetail('${esc(r.id||r.folio).replace(/'/g,"\\'")}')">Ver</button></td></tr>`).join('')}
 function findRow(id){return rows.find(r=>String(r.id||r.folio)===String(id))}
-window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=Number(r.precio)||0;const anticipoBase=Number(r.anticipo_pagado ?? r.anticipo)||0;const finalPagado=Number(r.pago_final)||0;const totalPagado=Number(r.total_pagado ?? (anticipoBase+finalPagado))||0;const saldo=Math.max(0,precio-totalPagado);$('detail').classList.remove('hidden');$('detail').innerHTML=`<div class="detailhead"><div><span class="folio">${esc(r.folio)}</span><h3 style="margin:5px 0 0">${esc(r.nombre||'Sin nombre')} · ${esc(r.modelo||'')}</h3></div><button class="btn" onclick="document.getElementById('detail').classList.add('hidden')">Cerrar</button></div><div class="detailgrid"><div class="kv"><span>IMEI</span><b>${esc(r.imei)}</b></div><div class="kv"><span>WhatsApp</span><b>${esc(r.whatsapp)}</b></div><div class="kv"><span>Estado</span><b>${esc(r.estado)}</b></div><div class="kv"><span>Precio total</span><b>${money(precio)}</b></div><div class="kv"><span>Total pagado</span><b>${money(totalPagado)}</b></div><div class="kv"><span>Saldo pendiente</span><b>${money(saldo)}</b></div><div class="kv"><span>Deuda mayor a 1 mes</span><b>${r.deuda_mayor_1_mes?'Sí':'No'}</b></div><div class="kv"><span>Estado / ubicación</span><b>${esc(r.estado_ubicacion||r.estado_cliente||'—')}</b></div></div><div style="margin-top:18px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019"><div style="font-weight:900;margin-bottom:10px">Control de pagos</div><div class="detailgrid" style="margin-top:0"><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">ANTICIPO PAGADO</label><input id="payAdvance" type="number" min="0" step="1" value="${anticipoBase}"></div><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">PAGO FINAL</label><input id="payFinal" type="number" min="0" step="1" value="${finalPagado}"></div></div><div class="actions"><button class="btn primary" onclick="savePayments()">Guardar pagos</button><span id="payMsg" style="align-self:center;color:#7dffb5;font-size:11px"></span></div></div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'})};
+window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=Number(r.precio)||0;const anticipoBase=Number(r.anticipo_pagado ?? r.anticipo)||0;const finalPagado=Number(r.pago_final)||0;const totalPagado=Number(r.total_pagado ?? (anticipoBase+finalPagado))||0;const saldo=Math.max(0,precio-totalPagado);$('detail').classList.remove('hidden');$('detail').innerHTML=`<div class="detailhead"><div><span class="folio">${esc(r.folio)}</span><h3 style="margin:5px 0 0">${esc(r.nombre||'Sin nombre')} · ${esc(r.modelo||'')}</h3></div><button class="btn" onclick="document.getElementById('detail').classList.add('hidden')">Cerrar</button></div><div class="detailgrid"><div class="kv"><span>IMEI</span><b>${esc(r.imei)}</b></div><div class="kv"><span>WhatsApp</span><b>${esc(r.whatsapp)}</b></div><div class="kv"><span>Estado</span><b>${esc(r.estado)}</b></div><div class="kv"><span>Precio total</span><b>${money(precio)}</b></div><div class="kv"><span>Total pagado</span><b>${money(totalPagado)}</b></div><div class="kv"><span>Saldo pendiente</span><b>${money(saldo)}</b></div><div class="kv"><span>Deuda mayor a 1 mes</span><b>${r.deuda_mayor_1_mes?'Sí':'No'}</b></div><div class="kv"><span>Estado / ubicación</span><b>${esc(r.estado_ubicacion||r.estado_cliente||'—')}</b></div></div><div style="margin-top:18px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019"><div style="font-weight:900;margin-bottom:10px">Control de pagos</div><div class="detailgrid" style="margin-top:0"><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">ANTICIPO PAGADO</label><input id="payAdvance" type="number" min="0" step="1" value="${anticipoBase}"></div><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">PAGO FINAL</label><input id="payFinal" type="number" min="0" step="1" value="${finalPagado}"></div></div><div class="actions"><button class="btn primary" onclick="savePayments()">Guardar pagos</button><span id="payMsg" style="align-self:center;color:#7dffb5;font-size:11px"></span></div></div><div id="quickActions" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019">
+<div style="font-weight:900;margin-bottom:6px">Acciones de comunicación</div>
+<div style="color:#8fa6b6;font-size:10px;line-height:1.5;margin-bottom:10px">Selecciona una acción para preparar el mensaje exacto correspondiente a la etapa actual del servicio.</div>
+<div class="actions" style="margin-top:0">
+<button class="btn primary" id="waAction1" onclick="openQuickWhatsApp(1)">WhatsApp · acción principal</button>
+<button class="btn" id="waAction2" onclick="openQuickWhatsApp(2)">WhatsApp · seguimiento</button>
+</div>
+<div id="waActionNote" style="margin-top:9px;color:#8fa6b6;font-size:10px"></div>
+</div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'});updateQuickActions()};
 
 function buildWhatsAppMessage(){
   if(!selected) return '';
@@ -38,6 +46,72 @@ function buildWhatsAppMessage(){
   };
   return mensajes[estado]||`Hola ${nombre}, te contactamos de APPLEX.\n\nActualización de tu servicio:\nFolio: ${folio}\nEstado: ${estado}\n\nSi necesitas información adicional, estamos a tus órdenes.\n\nAPPLEX`;
 }
+
+function quickActionData(){
+  if(!selected) return null;
+  const precio=Number(selected.precio)||0;
+  const advance=Number(selected.anticipo_pagado ?? selected.anticipo)||0;
+  const finalPay=Number(selected.pago_final)||0;
+  const total=Number(selected.total_pagado ?? (advance+finalPay))||0;
+  const saldo=Math.max(0,precio-total);
+  const anticipoRequerido=Number(selected.anticipo)||Math.ceil(precio/2);
+  const nombre=(selected.nombre||'cliente').trim().split(/\s+/)[0];
+  const folio=selected.folio||'—';
+  const modelo=selected.modelo||'iPhone';
+  const estado=selected.estado||'Solicitud recibida';
+
+  const actions={
+    'Solicitud recibida':[
+      ['Confirmar solicitud',`Hola ${nombre}, te contactamos de APPLEX.\n\nConfirmamos que recibimos correctamente tu solicitud de liberación para tu ${modelo}.\n\nFolio: ${folio}\nImporte del servicio: ${money(precio)}\nAnticipo requerido: ${money(anticipoRequerido)}\n\nTu solicitud quedó registrada. Nuestro equipo continuará con la revisión correspondiente y te informaremos cualquier actualización por este medio.\n\nAPPLEX`],
+      ['Solicitar anticipo',`Hola ${nombre}, te contactamos de APPLEX.\n\nPodemos continuar con tu servicio de liberación para tu ${modelo}.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nAnticipo requerido: ${money(anticipoRequerido)}\n\nSi deseas continuar, responde a este mensaje para indicarte el proceso de pago del anticipo.\n\nAPPLEX`]
+    ],
+    'IMEI revisado':[
+      ['Confirmar revisión',`Hola ${nombre}, te contactamos de APPLEX.\n\nLa revisión del IMEI de tu ${modelo} ha sido realizada.\n\nFolio: ${folio}\nImporte del servicio: ${money(precio)}\nAnticipo requerido: ${money(anticipoRequerido)}\n\nPodemos continuar con el servicio una vez confirmado el anticipo.\n\nAPPLEX`],
+      ['Solicitar anticipo',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu solicitud ya fue revisada y podemos continuar con el servicio de liberación de tu ${modelo}.\n\nFolio: ${folio}\nAnticipo requerido: ${money(anticipoRequerido)}\n\nResponde a este mensaje para indicarte el proceso de pago del anticipo.\n\nAPPLEX`]
+    ],
+    'Anticipo recibido':[
+      ['Confirmar anticipo',`Hola ${nombre}, te contactamos de APPLEX.\n\nConfirmamos el registro de tu anticipo para el servicio de tu ${modelo}.\n\nFolio: ${folio}\nAnticipo recibido: ${money(advance)}\nSaldo pendiente: ${money(saldo)}\n\nTu pago ha quedado registrado y daremos continuidad al proceso correspondiente.\n\nAPPLEX`],
+      ['Avisar inicio',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu anticipo ha sido registrado y podemos dar continuidad al servicio de liberación de tu ${modelo}.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nAnticipo recibido: ${money(advance)}\nSaldo pendiente: ${money(saldo)}\n\nTe informaremos cuando el servicio avance a la siguiente etapa.\n\nAPPLEX`]
+    ],
+    'En proceso':[
+      ['Avisar proceso',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu servicio de liberación para el ${modelo} se encuentra actualmente en proceso.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nSaldo pendiente: ${money(saldo)}\n\nTe notificaremos cuando exista una nueva actualización.\n\nAPPLEX`],
+      ['Seguimiento',`Hola ${nombre}, te contactamos de APPLEX.\n\nTe compartimos una actualización de tu servicio de liberación.\n\nFolio: ${folio}\nModelo: ${modelo}\nEstado actual: En proceso\nSaldo pendiente: ${money(saldo)}\n\nEl servicio continúa en proceso. Te informaremos cuando cambie de etapa.\n\nAPPLEX`]
+    ],
+    'Liberado':[
+      ['Avisar liberación',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu ${modelo} ha sido liberado correctamente.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nSaldo pendiente: ${money(saldo)}\n\nSi existe saldo pendiente, corresponde realizar el pago final para concluir administrativamente el servicio.\n\nAPPLEX`],
+      ['Solicitar pago final',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu ${modelo} ya se encuentra liberado y queda pendiente completar el pago final del servicio.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nPago pendiente: ${money(saldo)}\n\nResponde a este mensaje para indicarte el proceso de pago.\n\nAPPLEX`]
+    ],
+    'Pago final':[
+      ['Solicitar pago final',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu ${modelo} se encuentra liberado y está pendiente completar el pago final.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nSaldo pendiente: ${money(saldo)}\n\nUna vez confirmado el pago pendiente, podremos concluir administrativamente el servicio.\n\nAPPLEX`],
+      ['Confirmar saldo',`Hola ${nombre}, te contactamos de APPLEX.\n\nTe compartimos el saldo pendiente de tu servicio de liberación.\n\nFolio: ${folio}\nModelo: ${modelo}\nSaldo pendiente: ${money(saldo)}\n\nCuando realices el pago, por favor envíanos el comprobante por este medio para registrarlo.\n\nAPPLEX`]
+    ],
+    'Terminado':[
+      ['Confirmar término',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu servicio de liberación para el ${modelo} ha sido concluido.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nSaldo pendiente: ${money(saldo)}\n\nGracias por confiar en APPLEX. Estamos a tus órdenes para cualquier asistencia adicional.\n\nAPPLEX`],
+      ['Solicitar recomendación',`Hola ${nombre}, te contactamos de APPLEX.\n\nTu servicio de liberación para el ${modelo} ha sido concluido satisfactoriamente.\n\nFolio: ${folio}\n\nGracias por confiar en APPLEX. Si tu experiencia fue satisfactoria, agradeceremos mucho tu recomendación.\n\nAPPLEX`]
+    ]
+  };
+  return actions[estado] || actions['Solicitud recibida'];
+}
+function updateQuickActions(){
+  if(!selected) return;
+  const a=quickActionData();
+  if(!a) return;
+  const b1=document.getElementById('waAction1'), b2=document.getElementById('waAction2'), note=document.getElementById('waActionNote');
+  if(b1){b1.textContent='WhatsApp · '+a[0][0];}
+  if(b2){b2.textContent='WhatsApp · '+a[1][0];}
+  if(note){note.textContent='Estado actual: '+(selected.estado||'Solicitud recibida')+' · Los importes se toman directamente del registro.';}
+}
+window.openQuickWhatsApp=(which)=>{
+  if(!selected||!selected.whatsapp)return;
+  const a=quickActionData();
+  const item=a && a[which-1];
+  if(!item)return;
+  let phone=String(selected.whatsapp).replace(/\D/g,'');
+  if(phone.startsWith('52') && phone.length===12) phone=phone.slice(2);
+  if(phone.length!==10){alert('El número de WhatsApp no parece tener 10 dígitos. Verifícalo antes de enviar el mensaje.');return;}
+  window.open('https://wa.me/52'+phone+'?text='+encodeURIComponent(item[1]),'_blank');
+};
+
 window.openWhatsAppMessage=()=>{
   if(!selected||!selected.whatsapp)return;
   const msg=buildWhatsAppMessage();
@@ -49,7 +123,7 @@ window.openWhatsAppMessage=()=>{
 };
 
 window.savePayments=async()=>{if(!selected)return;const precio=Number(selected.precio)||0;const advance=Math.max(0,Number($('payAdvance').value)||0);const finalPay=Math.max(0,Number($('payFinal').value)||0);const total=advance+finalPay;const saldo=Math.max(0,precio-total);const payload={anticipo_pagado:advance,pago_final:finalPay,total_pagado:total,saldo_pendiente:saldo};if(advance>0 && !selected.fecha_anticipo)payload.fecha_anticipo=new Date().toISOString();if(finalPay>0 && !selected.fecha_pago_final)payload.fecha_pago_final=new Date().toISOString();let q=sb.from('solicitudes').update(payload);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {error}=await q;if(error){alert('No se pudieron guardar los pagos: '+error.message);return}Object.assign(selected,payload);const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);if(local)Object.assign(local,payload);render();openDetail(selected.id||selected.folio);setTimeout(()=>{if($('payMsg'))$('payMsg').textContent='Pagos guardados ✓'},50)};
-window.saveStatus=async()=>{if(!selected)return;const estado=$('newStatus').value;const key=selected.id?{id:selected.id}:{folio:selected.folio};let q=sb.from('solicitudes').update({estado}).select('id,folio,estado').limit(1);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {data,error}=await q; if(error){alert('No se pudo actualizar: '+error.message);return}selected.estado=estado;const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);if(local)local.estado=estado;render();openDetail(selected.id||selected.folio)};
+window.saveStatus=async()=>{if(!selected)return;const estado=$('newStatus').value;const key=selected.id?{id:selected.id}:{folio:selected.folio};let q=sb.from('solicitudes').update({estado}).select('id,folio,estado').limit(1);if(selected.id)q=q.eq('id',selected.id);else q=q.eq('folio',selected.folio);const {data,error}=await q; if(error){alert('No se pudo actualizar: '+error.message);return}selected.estado=estado;const local=rows.find(r=>(selected.id&&r.id===selected.id)||r.folio===selected.folio);if(local)local.estado=estado;render();openDetail(selected.id||selected.folio);updateQuickActions()};
 $('search').addEventListener('input',render);$('filter').addEventListener('change',render);$('refresh').addEventListener('click',load);$('logout').addEventListener('click',async()=>{await sb.auth.signOut();showLogin()});$('loginBtn').addEventListener('click',async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password){$('loginErr').textContent='Escribe email y contraseña.';return}$('loginBtn').disabled=true;$('loginErr').textContent='';const {error}=await sb.auth.signInWithPassword({email,password});$('loginBtn').disabled=false;if(error){$('loginErr').textContent=error.message;return}showApp();await load()});$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
 $('forgotBtn').addEventListener('click',async()=>{const email=$('email').value.trim();$('loginErr').textContent='';if(!email){$('loginErr').textContent='Escribe primero tu correo.';return}$('forgotBtn').disabled=true;const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});$('forgotBtn').disabled=false;if(error){$('loginErr').textContent=error.message;return}$('loginErr').style.color='#7dffb5';$('loginErr').textContent='Te enviamos un correo para crear una nueva contraseña. Abre ese enlace desde este dispositivo.'});
 $('resetBtn').addEventListener('click',async()=>{const p=$('newPassword').value,p2=$('newPassword2').value;$('resetErr').textContent='';if(p.length<8){$('resetErr').textContent='La contraseña debe tener al menos 8 caracteres.';return}if(p!==p2){$('resetErr').textContent='Las contraseñas no coinciden.';return}$('resetBtn').disabled=true;const {error}=await sb.auth.updateUser({password:p});$('resetBtn').disabled=false;if(error){$('resetErr').textContent=error.message;return}await sb.auth.signOut();alert('Contraseña actualizada. Ahora inicia sesión con tu nueva contraseña.');showLogin()});
