@@ -185,25 +185,9 @@ body:after{
 <option value="iPhone 18 Pro">iPhone 18 Pro</option>
 <option value="iPhone 18 Pro Max">iPhone 18 Pro Max</option>
 </select>
-    <label>Color del equipo</label>
-
-<div class="colorpicker" id="colorpicker"><button type="button" class="coloropt active" data-color="Titanio negro"><span class="swatch"></span>Titanio negro</button><button type="button" class="coloropt" data-color="Titanio blanco"><span class="swatch"></span>Titanio blanco</button><button type="button" class="coloropt" data-color="Titanio natural"><span class="swatch"></span>Titanio natural</button><button type="button" class="coloropt" data-color="Titanio del desierto"><span class="swatch"></span>Titanio del desierto</button></div>
-<div class="selectedcolor" id="selectedcolor">Color seleccionado: <b>—</b></div>
 <label>¿Tu equipo tiene deuda de más de 1 mes?</label>
     <div class="tw"><div class="choice active" data-debt="no">✓ &nbsp; No</div><div class="choice" data-debt="yes">✓ &nbsp; Sí</div></div>
     <label>Número de IMEI</label><input id="imei" inputmode="numeric" maxlength="15" placeholder="Ingresa los 15 dígitos">
-    <div class="real-product" id="realProduct">
-      <div class="real-product-head"><span>VISTA DEL EQUIPO SELECCIONADO</span><span class="real-product-dot"></span></div>
-      <div class="real-product-stage">
-        <div class="real-product-glow"></div>
-        <div class="official-viewer">
-          <img id="officialProduct" alt="iPhone seleccionado" src="https://www.apple.com/newsroom/images/2023/09/apple-unveils-iphone-15-pro-and-iphone-15-pro-max/article/Apple-iPhone-15-Pro-lineup-hero-230912_Full-Bleed-Image.jpg.large.jpg">
-        </div>
-        <div id="device3d" class="device-3d family-pro" aria-hidden="true"></div>
-      </div>
-      <div class="real-product-caption"><strong id="heroModel">iPhone 16 Pro Max</strong><span id="heroColor">Titanio negro</span></div>
-      <div class="real-product-note">Imagen de producto correspondiente al modelo y color seleccionado.</div>
-    </div>
     <label>Nombre completo</label><input id="name" placeholder="Tu nombre">
     <label>Número de WhatsApp</label><input id="wa" inputmode="numeric" maxlength="10" placeholder="10 dígitos">
     <label>Estado</label><select id="state"><option value="">Selecciona tu estado</option><option>Sinaloa</option><option>Sonora</option><option>Chihuahua</option><option>Jalisco</option><option>Ciudad de México</option><option>Nuevo León</option><option>Otro estado</option></select>
@@ -437,10 +421,8 @@ function selectColor(c,b){
 }
 function update(){
  const m=$("model").value, total=PRICES[m]+(document.querySelector('[data-debt="yes"].active')?100:0);
- $("heroModel").textContent=m; $("price").textContent=money(total); $("service").textContent=money(total);
+ $("price").textContent=money(total); $("service").textContent=money(total);
  $("deposit").textContent=money(total/2); $("balance").textContent=money(total/2);
- renderColors(m);
- setRealProduct(m, (COLORS[m]||[])[0] || selectedColor);
 }
 function toast(t){const x=$("toast"); if(x){x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),4000);} else alert(t);}
 $("model").addEventListener("change",update);
@@ -452,19 +434,18 @@ $("send").addEventListener("click",async function(e){
  e.preventDefault();
  const m=$("model").value, imei=$("imei").value.trim(), name=$("name").value.trim(), wa=$("wa").value.trim(), state=$("state").value;
  if(!m)return toast("Selecciona el modelo.");
- if(!selectedColor)return toast("Selecciona el color.");
  if(imei.length!==15)return toast("El IMEI debe tener 15 dígitos.");
  if(!name)return toast("Escribe tu nombre.");
  if(wa.length!==10)return toast("El WhatsApp debe tener 10 dígitos.");
  if(!state)return toast("Selecciona tu estado.");
  const debt=document.querySelector('[data-debt="yes"].active')!==null;
  const price=PRICES[m]+(debt?100:0), folio="APP-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+String(Date.now()).slice(-6);
- const data={folio,nombre:name,whatsapp:wa,imei,modelo:m,color:selectedColor,deuda_mayor_1_mes:debt,precio:price,anticipo:Math.round(price/2),estado:"Solicitud recibida"};
+ const data={folio,nombre:name,whatsapp:wa,imei,modelo:m,deuda_mayor_1_mes:debt,precio:price,anticipo:Math.round(price/2),estado:"Solicitud recibida"};
  const btn=$("send"), old=btn.textContent; btn.disabled=true; btn.textContent="GUARDANDO…";
  try{
   const r=await fetch(SUPA+"/rest/v1/solicitudes",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(data)});
   if(!r.ok){const t=await r.text();throw new Error(t||"Supabase rechazó la solicitud.");}
-  const msg=`Hola APPLEX 👋\n\nQuiero solicitar la liberación de mi iPhone.\n\nFolio: ${folio}\nModelo: ${m}\nColor: ${selectedColor}\nIMEI: ${imei}\nNombre: ${name}\nWhatsApp: ${wa}\nCotización: ${money(price)}\nAnticipo (50%): ${money(price/2)}`;
+  const msg=`Hola APPLEX 👋\n\nQuiero solicitar la liberación de mi iPhone.\n\nFolio: ${folio}\nModelo: ${m}\nIMEI: ${imei}\nNombre: ${name}\nWhatsApp: ${wa}\nCotización: ${money(price)}\nAnticipo (50%): ${money(price/2)}`;
   window.location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
  }catch(err){toast("No se pudo guardar: "+err.message);}finally{btn.disabled=false;btn.textContent=old;}
 });
@@ -481,7 +462,6 @@ window.APPLEX_ENVIAR = async function(){
   btn.innerHTML="PROCESANDO…";
   try{
     const model=document.getElementById("model").value;
-    const color=document.querySelector("#colorpicker .coloropt.active")?.dataset.color || "";
     const imei=document.getElementById("imei").value.trim();
     const nombre=document.getElementById("name").value.trim();
     const whatsapp=document.getElementById("wa").value.trim();
@@ -489,7 +469,6 @@ window.APPLEX_ENVIAR = async function(){
     const deuda=!!document.querySelector('[data-debt="yes"].active');
 
     if(!model) throw new Error("Selecciona el modelo.");
-    if(!color) throw new Error("Selecciona el color.");
     if(imei.length!==15) throw new Error("El IMEI debe tener 15 dígitos.");
     if(!nombre) throw new Error("Escribe tu nombre.");
     if(whatsapp.length!==10) throw new Error("El WhatsApp debe tener 10 dígitos.");
@@ -508,7 +487,7 @@ window.APPLEX_ENVIAR = async function(){
     const folio="APP-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+String(Date.now()).slice(-6);
 
     const payload={
-      folio,nombre,whatsapp,imei,modelo:model,color,
+      folio,nombre,whatsapp,imei,modelo:model,
       deuda_mayor_1_mes:deuda,precio,anticipo:Math.round(precio/2),
       estado:"Solicitud recibida"
     };
@@ -538,7 +517,6 @@ Quiero solicitar la liberación de mi iPhone.
 
 Folio: ${folio}
 Modelo: ${model}
-Color: ${color}
 IMEI: ${imei}
 Nombre: ${nombre}
 WhatsApp: ${whatsapp}
