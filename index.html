@@ -128,6 +128,97 @@ body:after{
 @media(max-width:720px){.official-viewer{height:560px;width:100%}.official-viewer img{transform:scale(1.32)}}
 .real-product-caption{text-align:center;margin-top:2px}.real-product-caption strong{display:block;font-size:18px;letter-spacing:.1px}.real-product-caption span{display:block;margin-top:4px;color:#b6c8d4;font-size:12px}.real-product-note{text-align:center;color:#617a8a;font-size:8px;margin-top:8px}
 @media(max-width:720px){.real-product-stage{height:470px}.device-3d{width:250px;height:370px;transform:rotateY(-13deg) rotateX(3deg) rotateZ(-2deg) scale(1.05)}.device-3d.max{height:400px;width:270px}.device-3d.mini{height:325px;width:225px}}
+
+/* APPLEX — RESPONSIVE FIX V2: sin desbordamiento y conservando CONSULTAR ESTADO */
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+*, *::before, *::after{
+  box-sizing:border-box;
+}
+img, video, canvas, svg{
+  max-width:100%;
+}
+.container{
+  width:100%;
+  min-width:0;
+  max-width:1480px;
+}
+.hero,
+.panel,
+.form,
+.intro,
+.models,
+.how,
+.footer,
+.real-product,
+.real-product-stage,
+.official-viewer{
+  min-width:0;
+  max-width:100%;
+}
+
+@media(max-width:720px){
+  .container{
+    width:100%;
+    max-width:100%;
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .hero{
+    width:100%;
+    max-width:100%;
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .intro,
+  .panel,
+  .form,
+  .models,
+  .how,
+  .footer{
+    width:100%;
+    max-width:100%;
+  }
+
+  .showcase{
+    max-width:100%;
+  }
+
+  /* CONSULTA DE SOLICITUD: apilar campos y conservar el botón */
+  #applex-status{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+  }
+
+  #applex-status > div[style*="grid-template-columns"]{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  #applex-status input,
+  #applex-status button{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+
+  .official-viewer{
+    width:100%;
+    max-width:100%;
+  }
+
+  .official-viewer img{
+    max-width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
