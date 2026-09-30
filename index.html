@@ -220,6 +220,68 @@ img, video, canvas, svg{
 }
 
 </style>
+
+<style id="applex-visual-v2">
+/* APPLEX VISUAL V2 — solo presentación. No modifica IDs ni funciones. */
+:root{--ax:#16c8ff;--ax2:#426bff;--ink:#050607;--paper:#f7f9fb}
+html{scroll-behavior:smooth}
+body{background:#030405!important;color:#f7f9fb!important;overflow-x:hidden}
+body:before{background:radial-gradient(circle at 50% 8%,rgba(0,196,255,.16),transparent 25%),radial-gradient(circle at 10% 70%,rgba(66,107,255,.12),transparent 30%),linear-gradient(180deg,#020304 0%,#07090b 48%,#020304 100%)!important}
+.container{max-width:1540px!important;padding:18px 24px 80px!important}
+.nav{height:76px!important;margin-bottom:18px;padding:8px 12px 8px 18px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(10,12,14,.66);backdrop-filter:blur(24px);box-shadow:0 18px 60px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.08);position:relative;z-index:20}
+.logo{height:42px!important;filter:drop-shadow(0 0 16px rgba(20,200,255,.22))}
+.navlinks{gap:22px!important;font-size:10px!important;letter-spacing:1.1px!important}
+.navcta{background:#f7f9fb;color:#050607!important;border:0!important;border-radius:14px!important;padding:12px 18px!important;box-shadow:0 10px 30px rgba(255,255,255,.12)!important}
+
+.hero{position:relative!important;display:grid!important;grid-template-columns:minmax(0,1fr) 455px!important;gap:0!important;min-height:760px!important;border-radius:34px;overflow:hidden;background:#080a0c;border:1px solid rgba(255,255,255,.1);box-shadow:0 35px 100px rgba(0,0,0,.55)}
+.hero:before{content:"";position:absolute;inset:0;z-index:0;background:
+linear-gradient(90deg,rgba(0,0,0,.10) 0%,rgba(0,0,0,.04) 52%,rgba(0,0,0,.70) 100%),
+linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.72)),
+repeating-linear-gradient(90deg,transparent 0 72px,rgba(255,255,255,.025) 73px 74px),
+linear-gradient(180deg,#111518 0 8%,#0b0e10 8% 10%,#171b1d 10% 11%,#07090a 11% 100%);}
+.hero:after{content:"APPLEX";position:absolute;z-index:0;left:3%;top:5%;font-size:clamp(90px,15vw,220px);font-weight:950;letter-spacing:-.09em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.09);opacity:.9;pointer-events:none}
+.intro{z-index:2!important;min-height:760px!important;padding:100px 40px 50px 62px!important;background:transparent!important;border-radius:0!important;overflow:hidden}
+.intro:before{content:"";position:absolute;inset:16% 0 0 43%;z-index:-1;background:
+linear-gradient(180deg,transparent 0 8%,rgba(255,255,255,.07) 8% 8.5%,transparent 8.5% 30%,rgba(255,255,255,.06) 30% 30.5%,transparent 30.5% 53%,rgba(255,255,255,.06) 53% 53.5%,transparent 53.5% 76%,rgba(255,255,255,.07) 76% 76.5%,transparent 76.5%),
+repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 96px);
+box-shadow:inset 0 0 100px rgba(0,0,0,.7);opacity:.8}
+.intro:after{content:"";position:absolute;z-index:-1;right:8%;top:20%;width:250px;height:500px;border-radius:42px;border:2px solid rgba(255,255,255,.45);background:linear-gradient(145deg,#1c2429,#06090b 58%,#11171c);box-shadow:30px 45px 80px #000,0 0 70px rgba(0,196,255,.14),inset 0 0 25px rgba(255,255,255,.12);transform:rotate(9deg);opacity:.95}
+.eyebrow{position:relative;display:inline-flex!important;align-items:center;gap:10px;color:#d8f7ff!important;letter-spacing:2.6px!important;font-size:10px!important;padding:8px 12px;border:1px solid rgba(255,255,255,.16);border-radius:99px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+.eyebrow:before{content:"";width:6px;height:6px;border-radius:50%;background:#16d5ff;box-shadow:0 0 12px #16d5ff}
+.intro h1{position:relative;font-size:clamp(64px,7.3vw,112px)!important;line-height:.82!important;letter-spacing:-6px!important;margin:24px 0 22px!important;text-shadow:0 18px 60px #000!important}
+.intro h1 span{color:#fff!important;font-style:normal!important;background:linear-gradient(90deg,#fff 10%,#21cfff 60%,#4779ff);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.intro p{font-size:18px!important;max-width:410px!important;color:#d4dde2!important}
+.benefits{max-width:390px!important;gap:10px!important}
+.benefit{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.benefit .icon{width:38px!important;height:38px!important;border-radius:12px!important;font-size:17px!important;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)!important}
+.benefit b{font-size:10px!important;letter-spacing:.4px}.benefit span{font-size:9px!important}
+
+.hero>.form{z-index:5!important;margin:38px 30px 38px 0!important;align-self:center!important;max-height:685px;overflow:auto;border-radius:28px!important;border:1px solid rgba(255,255,255,.16)!important;background:rgba(10,12,14,.72)!important;backdrop-filter:blur(28px)!important;box-shadow:-25px 35px 90px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.1)!important}
+.form{padding:25px!important}.formtop{border-bottom-color:rgba(255,255,255,.1)!important}.formtop h2{font-size:17px!important}.att{font-size:14px!important;color:#fff}.att i{color:#16c8ff!important}
+.steps{margin:14px 0 0!important}.step{font-size:8px!important}.step b{font-size:12px!important}
+label{font-size:9px!important;letter-spacing:.4px!important;color:#aebbc2!important}select,input{background:rgba(255,255,255,.055)!important;border-color:rgba(255,255,255,.13)!important;border-radius:12px!important;padding:13px!important}
+.choice{background:rgba(255,255,255,.045)!important;border-color:rgba(255,255,255,.12)!important}.choice.active{background:rgba(20,200,255,.10)!important;border-color:#16c8ff!important}
+.quote{background:linear-gradient(145deg,rgba(20,200,255,.13),rgba(255,255,255,.035))!important;border-color:rgba(22,200,255,.45)!important;border-radius:18px!important}.price{font-size:34px!important}
+.btn{background:#f7f9fb!important;color:#050607!important;border-radius:13px!important;box-shadow:0 14px 30px rgba(255,255,255,.13)!important}
+
+.models{margin-top:26px!important;padding:26px!important;border-radius:28px!important;background:#0a0c0e!important;border:1px solid rgba(255,255,255,.09)!important;box-shadow:0 25px 80px #0008!important}
+.modelshead h3{font-size:24px!important;letter-spacing:-.5px}.filters{margin:18px 0!important}.filter{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.12)!important}.filter.active{background:#fff!important;color:#050607!important;border-color:#fff!important;box-shadow:none!important}
+.modelgrid{gap:12px!important}.modelcard{background:linear-gradient(145deg,#121619,#080a0c)!important;border-color:rgba(255,255,255,.1)!important;border-radius:18px!important;padding:10px!important}.modelcard:hover,.modelcard.active{border-color:#16c8ff!important;box-shadow:0 0 28px rgba(22,200,255,.14)!important}.modelpic{height:125px!important;border-radius:13px!important;background:linear-gradient(145deg,#3c454b,#12171b)!important}.modelpic:after{background:linear-gradient(155deg,#263640,#050709)!important}
+
+/* NUEVA SECCIÓN DE COMPAÑÍAS: visual, sin lógica */
+.applex-carriers{position:relative;margin-top:26px;padding:54px 34px;border-radius:30px;overflow:hidden;background:linear-gradient(120deg,#f5f7f8,#dfe4e7 48%,#f8fafb);color:#071015;border:1px solid rgba(255,255,255,.75);box-shadow:0 30px 90px rgba(0,0,0,.28)}
+.applex-carriers:before{content:"";position:absolute;width:380px;height:380px;right:-100px;top:-150px;border-radius:50%;background:rgba(0,184,255,.12);filter:blur(30px)}
+.applex-carriers .kicker{font-size:10px;letter-spacing:2px;font-weight:900;color:#60727b}.applex-carriers h2{font-size:clamp(36px,5vw,66px);line-height:.9;letter-spacing:-3px;margin:12px 0 14px;max-width:700px}.applex-carriers p{color:#617078;max-width:620px;margin:0 0 28px}.carrier-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.carrier{height:82px;background:#fff;border:1px solid #d8e0e4;border-radius:18px;display:grid;place-items:center;font-weight:950;font-size:15px;box-shadow:0 10px 24px rgba(22,35,42,.07);transition:.25s}.carrier:hover{transform:translateY(-4px);box-shadow:0 16px 35px rgba(22,35,42,.12)}.carrier span{font-size:11px;opacity:.5;font-weight:700;margin-top:-18px}
+
+.how{margin-top:26px!important;padding:30px!important;border-radius:28px!important;background:#0a0c0e!important;border:1px solid rgba(255,255,255,.09)!important}.how h3{font-size:25px!important}.howgrid{grid-template-columns:repeat(3,1fr)!important}.howcard{background:linear-gradient(145deg,#111518,#07090a)!important;border-color:rgba(255,255,255,.08)!important;border-radius:20px!important;padding:20px!important}.hownum{background:#fff!important;color:#050607!important;box-shadow:none!important}
+.footer{margin-top:26px!important;padding:25px!important;border-radius:25px!important;background:#080a0c!important;border-color:rgba(255,255,255,.09)!important}.foot{border-color:rgba(255,255,255,.09)!important}
+#applex-status{max-width:1180px!important;margin:65px auto 30px!important;padding:34px!important;border-radius:30px!important;background:linear-gradient(145deg,#f5f7f8,#dfe5e8)!important;color:#081015!important;border:0!important;box-shadow:0 30px 90px rgba(0,0,0,.3)!important}#applex-status input{background:#fff!important;color:#081015!important;border-color:#d2dade!important}#applex-status button{background:#081015!important;color:#fff!important;border-radius:13px!important}
+#applex-admin{border-radius:28px!important}
+
+@media(max-width:1100px){.hero{grid-template-columns:minmax(0,1fr) 390px!important}.intro{padding-left:38px!important}.intro h1{font-size:68px!important}.carrier-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.container{padding:10px 10px 50px!important}.nav{height:64px!important;border-radius:18px!important}.navcta{padding:10px 13px!important}.hero{display:block!important;min-height:0!important;border-radius:25px!important}.hero:after{font-size:80px;top:2%}.intro{min-height:620px!important;padding:82px 22px 30px!important}.intro:before{inset:25% -10% 0 5%;opacity:.65}.intro:after{right:8%;top:25%;width:150px;height:310px;border-radius:28px;opacity:.65}.intro h1{font-size:58px!important;letter-spacing:-4px!important;max-width:330px}.intro p{font-size:16px!important;max-width:280px!important}.benefits{max-width:285px!important}.benefit:nth-child(n+3){display:none}.hero>.form{margin:0!important;border-radius:0!important;max-height:none!important;border:0!important;border-top:1px solid rgba(255,255,255,.12)!important;background:rgba(6,8,10,.94)!important;box-shadow:none!important}.models{padding:18px!important;border-radius:22px!important}.modelgrid{grid-template-columns:repeat(3,1fr)!important}.modelpic{height:100px!important}.applex-carriers{padding:38px 20px;border-radius:24px}.applex-carriers h2{font-size:42px!important}.carrier-grid{grid-template-columns:repeat(2,1fr)!important}.carrier{height:70px}.how{padding:20px!important;border-radius:22px!important}.howgrid{grid-template-columns:1fr!important}.footer{grid-template-columns:1fr!important}.foot{border:0!important;padding:12px 0!important;border-bottom:1px solid rgba(255,255,255,.08)!important}.foot:last-child{border:0!important}#applex-status{margin:45px 0 20px!important;border-radius:24px!important;padding:24px 18px!important}}
+</style>
+
 </head>
 <body>
 <div class="container">
@@ -335,6 +397,21 @@ animation:applexFacebookPulse 2.2s ease-in-out infinite;
 
 
 
+
+
+<section class="applex-carriers" aria-label="Compañías compatibles">
+  <div class="kicker">LIBERTAD DE RED · MÉXICO</div>
+  <h2>Libera tu equipo para cualquier compañía.</h2>
+  <p>Después de la liberación, tu iPhone puede utilizarse con la compañía que prefieras, sujeto a la compatibilidad y condiciones de la red.</p>
+  <div class="carrier-grid">
+    <div class="carrier">TELCEL<span>MÉXICO</span></div>
+    <div class="carrier">AT&amp;T<span>MÉXICO</span></div>
+    <div class="carrier">MOVISTAR<span>MÉXICO</span></div>
+    <div class="carrier">BAIT<span>MÉXICO</span></div>
+    <div class="carrier">VIRGIN<span>MOBILE</span></div>
+    <div class="carrier">CIERTO<span>MÉXICO</span></div>
+  </div>
+</section>
 
 <section id="applex-status" style="
 max-width:1120px;margin:55px auto 30px;padding:28px;
