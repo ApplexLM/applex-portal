@@ -20,6 +20,8 @@
 <div id="bizBreakdown" style="display:flex;gap:8px;flex-wrap:wrap"></div>
 </div>
 </section>
+<section id="internalAlerts" class="card" style="padding:15px;margin:12px 0"></section>
+<section id="clientDirectory" style="margin:12px 0"></section>
 <section class="card toolbar"><input id="search" placeholder="Buscar folio, IMEI, nombre, WhatsApp o modelo…"><select id="filter"><option value="">Todos los estados</option><option>Solicitud recibida</option><option>IMEI revisado</option><option>Anticipo recibido</option><option>En proceso</option><option>Liberado</option><option>Pago final</option><option>Terminado</option></select><button id="refresh" class="btn primary">Actualizar</button></section><section class="card tablewrap"><div id="tableState" class="loading">Cargando solicitudes…</div><table id="table" class="table hidden"><thead><tr><th>Folio</th><th>Fecha</th><th>Cliente</th><th>Modelo</th><th>IMEI</th><th>WhatsApp</th><th>Precio</th><th>Anticipo</th><th>Estado</th><th></th></tr></thead><tbody id="tbody"></tbody></table></section><section id="detail" class="card detail hidden"></section><p class="footnote">Los datos se consultan desde Supabase usando la sesión autenticada. No se utiliza una clave de servicio en el navegador. WhatsApp abre un mensaje preparado según el estado actual del servicio.</p></div></div>
 <script>
 const SUPA='https://owjzoliqpjxnrhexrcqz.supabase.co';const KEY='sb_publishable_GfCVRij21dvZchfbhAyz_g_5RVaZlOS';const sb=supabase.createClient(SUPA,KEY);const STATUSES=['Solicitud recibida','IMEI revisado','Anticipo recibido','En proceso','Liberado','Pago final','Terminado'];let rows=[];let selected=null;
@@ -28,6 +30,28 @@ function logo(){const src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhIAAAF
 function showLogin(){ $('login').classList.remove('hidden');$('reset').classList.add('hidden');$('app').classList.add('hidden') }function showReset(){ $('login').classList.add('hidden');$('reset').classList.remove('hidden');$('app').classList.add('hidden') }function showApp(){ $('login').classList.add('hidden');$('reset').classList.add('hidden');$('app').classList.remove('hidden') }
 async function load(){ $('tableState').classList.remove('hidden');$('tableState').textContent='Cargando solicitudes…';$('table').classList.add('hidden'); const {data,error}=await sb.from('solicitudes').select('*').order('created_at',{ascending:false}); if(error){$('tableState').textContent='Error: '+error.message;return} rows=data||[];render();}
 
+
+
+function renderAttentionSummary(){
+  const box=document.getElementById('internalAlerts');
+  if(!box || !Array.isArray(rows)) return;
+  const active=rows.filter(r=>String(r.estado||'')!=='Terminado').length;
+  const received=rows.filter(r=>String(r.estado||'')==='Solicitud recibida').length;
+  const reviewed=rows.filter(r=>String(r.estado||'')==='IMEI revisado').length;
+  const process=rows.filter(r=>String(r.estado||'')==='En proceso').length;
+  const released=rows.filter(r=>String(r.estado||'')==='Liberado').length;
+  const finalPay=rows.filter(r=>String(r.estado||'')==='Pago final').length;
+  const pills=[
+    ['Activas',active],['Nuevas',received],['IMEI revisado',reviewed],
+    ['En proceso',process],['Liberadas',released],['Pago final',finalPay]
+  ];
+  const el=document.createElement('div');
+  el.style.marginTop='10px';
+  el.innerHTML=`<div style="display:flex;gap:7px;flex-wrap:wrap">
+    ${pills.map(([label,n])=>`<span style="padding:6px 9px;border:1px solid #183243;border-radius:18px;background:#08131d;color:#9fb3c0;font-size:9px">${label}: <b style="color:#fff">${n}</b></span>`).join('')}
+  </div>`;
+  box.appendChild(el);
+}
 
 function renderInternalAlerts(){
   const box=document.getElementById('internalAlerts');
@@ -173,7 +197,7 @@ function renderBusinessDashboard(){
   }
 }
 
-function render(){renderBusinessDashboard();renderInternalAlerts();renderClientDirectory();const q=$('search').value.trim().toLowerCase(), f=$('filter').value;const filtered=rows.filter(r=>{const hay=[r.folio,r.nombre,r.whatsapp,r.imei,r.modelo,r.estado].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!f||r.estado===f)});$('stTotal').textContent=rows.length;$('stReceived').textContent=rows.filter(r=>r.estado==='Solicitud recibida').length;$('stProcess').textContent=rows.filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado)).length;$('stDone').textContent=rows.filter(r=>r.estado==='Terminado').length;if(!filtered.length){$('tableState').classList.remove('hidden');$('tableState').textContent=rows.length?'No hay coincidencias.':'Aún no hay solicitudes.';$('table').classList.add('hidden');return}$('tableState').classList.add('hidden');$('table').classList.remove('hidden');$('tbody').innerHTML=filtered.map((r,i)=>`<tr><td><span class="folio">${esc(r.folio)}</span></td><td>${r.created_at?new Date(r.created_at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}):'—'}</td><td>${esc(r.nombre)}</td><td>${esc(r.modelo)}</td><td>${esc(r.imei)}</td><td>${esc(r.whatsapp)}</td><td class="price">${money(r.precio)}</td><td>${money(r.anticipo)}</td><td><span class="status s-${Math.max(0,STATUSES.indexOf(r.estado))}">${esc(r.estado)}</span></td><td><button class="btn" onclick="openDetail('${esc(r.id||r.folio).replace(/'/g,"\\'")}')">Ver</button></td></tr>`).join('')}
+function render(){renderBusinessDashboard();renderInternalAlerts();renderAttentionSummary();renderClientDirectory();const q=$('search').value.trim().toLowerCase(), f=$('filter').value;const filtered=rows.filter(r=>{const hay=[r.folio,r.nombre,r.whatsapp,r.imei,r.modelo,r.estado].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!f||r.estado===f)});$('stTotal').textContent=rows.length;$('stReceived').textContent=rows.filter(r=>r.estado==='Solicitud recibida').length;$('stProcess').textContent=rows.filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado)).length;$('stDone').textContent=rows.filter(r=>r.estado==='Terminado').length;if(!filtered.length){$('tableState').classList.remove('hidden');$('tableState').textContent=rows.length?'No hay coincidencias.':'Aún no hay solicitudes.';$('table').classList.add('hidden');return}$('tableState').classList.add('hidden');$('table').classList.remove('hidden');$('tbody').innerHTML=filtered.map((r,i)=>`<tr><td><span class="folio">${esc(r.folio)}</span></td><td>${r.created_at?new Date(r.created_at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}):'—'}</td><td>${esc(r.nombre)}</td><td>${esc(r.modelo)}</td><td>${esc(r.imei)}</td><td>${esc(r.whatsapp)}</td><td class="price">${money(r.precio)}</td><td>${money(r.anticipo)}</td><td><span class="status s-${Math.max(0,STATUSES.indexOf(r.estado))}">${esc(r.estado)}</span></td><td><button class="btn" onclick="openDetail('${esc(r.id||r.folio).replace(/'/g,"\\'")}')">Ver</button></td></tr>`).join('')}
 function findRow(id){return rows.find(r=>String(r.id||r.folio)===String(id))}
 
 
