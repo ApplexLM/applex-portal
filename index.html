@@ -634,4 +634,32 @@ Anticipo: $${Math.round(precio/2).toLocaleString("es-MX")} MXN`;
 };
 </script>
 
+
+<script>
+window.applexCheckStatus = async function(){
+  const SUPA="https://owjzoliqpjxnrhexrcqz.supabase.co";
+  const KEY="sb_publishable_GfCVRij21dvZchfbhAyz_g_5RVaZlOS";
+  const folio=(document.getElementById("applexFolioSearch")?.value||"").trim().toUpperCase();
+  const whatsapp=(document.getElementById("applexStatusWhatsApp")?.value||"").replace(/\D/g,"").slice(0,10);
+  const result=document.getElementById("applexStatusResult");
+  const button=document.querySelector('#applex-status button[onclick="applexCheckStatus()"]');
+  const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  if(!result)return;
+  if(!folio){result.innerHTML='<div style="padding:14px;border-radius:13px;background:#25100f;border:1px solid #6b2a25;color:#ffd8d3">Ingresa tu folio.</div>';return;}
+  if(whatsapp.length!==10){result.innerHTML='<div style="padding:14px;border-radius:13px;background:#25100f;border:1px solid #6b2a25;color:#ffd8d3">Ingresa un WhatsApp válido de 10 dígitos.</div>';return;}
+  result.innerHTML='<div style="padding:14px;border-radius:13px;background:#081722;border:1px solid #29485c;color:#b9cbd6">Consultando…</div>';
+  if(button){button.disabled=true;button.textContent="Consultando…";}
+  try{
+    const p=new URLSearchParams({select:"folio,nombre,whatsapp,modelo,estado,precio,anticipo",folio:"eq."+folio,whatsapp:"eq."+whatsapp,limit:"1"});
+    const response=await fetch(SUPA+"/rest/v1/solicitudes?"+p.toString(),{headers:{apikey:KEY,Authorization:"Bearer "+KEY}});
+    if(!response.ok)throw new Error("No se pudo consultar la solicitud ("+response.status+").");
+    const rows=await response.json();
+    if(!Array.isArray(rows)||!rows.length){result.innerHTML='<div style="padding:14px;border-radius:13px;background:#25100f;border:1px solid #6b2a25;color:#ffd8d3">No encontramos una solicitud con ese folio y WhatsApp.</div>';return;}
+    const item=rows[0];
+    result.innerHTML='<div style="padding:18px;border-radius:16px;background:linear-gradient(145deg,#082235,#061019);border:1px solid #0b9ed1;color:#fff"><div style="font-size:10px;letter-spacing:1.5px;color:#72dfff;font-weight:800">SOLICITUD ENCONTRADA</div><div style="font-size:25px;font-weight:900;margin:6px 0 14px">'+esc(item.estado||"Sin estado registrado")+'</div><div style="display:grid;gap:7px;font-size:12px;color:#c6d5de"><div><b>Folio:</b> '+esc(item.folio||folio)+'</div><div><b>Modelo:</b> '+esc(item.modelo||"—")+'</div></div></div>';
+  }catch(e){result.innerHTML='<div style="padding:14px;border-radius:13px;background:#25100f;border:1px solid #6b2a25;color:#ffd8d3">'+esc(e.message||"Ocurrió un error al consultar.")+'</div>';}
+  finally{if(button){button.disabled=false;button.textContent="Consultar estado";}}
+};
+</script>
+
 </body></html>
