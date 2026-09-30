@@ -13,7 +13,11 @@ function showLogin(){ $('login').classList.remove('hidden');$('reset').classList
 async function load(){ $('tableState').classList.remove('hidden');$('tableState').textContent='Cargando solicitudes…';$('table').classList.add('hidden'); const {data,error}=await sb.from('solicitudes').select('*').order('created_at',{ascending:false}); if(error){$('tableState').textContent='Error: '+error.message;return} rows=data||[];render();}
 function render(){const q=$('search').value.trim().toLowerCase(), f=$('filter').value;const filtered=rows.filter(r=>{const hay=[r.folio,r.nombre,r.whatsapp,r.imei,r.modelo,r.estado].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!f||r.estado===f)});$('stTotal').textContent=rows.length;$('stReceived').textContent=rows.filter(r=>r.estado==='Solicitud recibida').length;$('stProcess').textContent=rows.filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado)).length;$('stDone').textContent=rows.filter(r=>r.estado==='Terminado').length;if(!filtered.length){$('tableState').classList.remove('hidden');$('tableState').textContent=rows.length?'No hay coincidencias.':'Aún no hay solicitudes.';$('table').classList.add('hidden');return}$('tableState').classList.add('hidden');$('table').classList.remove('hidden');$('tbody').innerHTML=filtered.map((r,i)=>`<tr><td><span class="folio">${esc(r.folio)}</span></td><td>${r.created_at?new Date(r.created_at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}):'—'}</td><td>${esc(r.nombre)}</td><td>${esc(r.modelo)}</td><td>${esc(r.imei)}</td><td>${esc(r.whatsapp)}</td><td class="price">${money(r.precio)}</td><td>${money(r.anticipo)}</td><td><span class="status s-${Math.max(0,STATUSES.indexOf(r.estado))}">${esc(r.estado)}</span></td><td><button class="btn" onclick="openDetail('${esc(r.id||r.folio).replace(/'/g,"\\'")}')">Ver</button></td></tr>`).join('')}
 function findRow(id){return rows.find(r=>String(r.id||r.folio)===String(id))}
-window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=Number(r.precio)||0;const anticipoBase=Number(r.anticipo_pagado ?? r.anticipo)||0;const finalPagado=Number(r.pago_final)||0;const totalPagado=Number(r.total_pagado ?? (anticipoBase+finalPagado))||0;const saldo=Math.max(0,precio-totalPagado);$('detail').classList.remove('hidden');$('detail').innerHTML=`<div class="detailhead"><div><span class="folio">${esc(r.folio)}</span><h3 style="margin:5px 0 0">${esc(r.nombre||'Sin nombre')} · ${esc(r.modelo||'')}</h3></div><button class="btn" onclick="document.getElementById('detail').classList.add('hidden')">Cerrar</button></div><div class="detailgrid"><div class="kv"><span>IMEI</span><b>${esc(r.imei)}</b></div><div class="kv"><span>WhatsApp</span><b>${esc(r.whatsapp)}</b></div><div class="kv"><span>Estado</span><b>${esc(r.estado)}</b></div><div class="kv"><span>Precio total</span><b>${money(precio)}</b></div><div class="kv"><span>Total pagado</span><b>${money(totalPagado)}</b></div><div class="kv"><span>Saldo pendiente</span><b>${money(saldo)}</b></div><div class="kv"><span>Deuda mayor a 1 mes</span><b>${r.deuda_mayor_1_mes?'Sí':'No'}</b></div><div class="kv"><span>Estado / ubicación</span><b>${esc(r.estado_ubicacion||r.estado_cliente||'—')}</b></div></div><div style="margin-top:18px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019"><div style="font-weight:900;margin-bottom:10px">Control de pagos</div><div class="detailgrid" style="margin-top:0"><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">ANTICIPO PAGADO</label><input id="payAdvance" type="number" min="0" step="1" value="${anticipoBase}"></div><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">PAGO FINAL</label><input id="payFinal" type="number" min="0" step="1" value="${finalPagado}"></div></div><div class="actions"><button class="btn primary" onclick="savePayments()">Guardar pagos</button><span id="payMsg" style="align-self:center;color:#7dffb5;font-size:11px"></span></div></div><div id="quickActions" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019">
+window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=Number(r.precio)||0;const anticipoBase=Number(r.anticipo_pagado ?? r.anticipo)||0;const finalPagado=Number(r.pago_final)||0;const totalPagado=Number(r.total_pagado ?? (anticipoBase+finalPagado))||0;const saldo=Math.max(0,precio-totalPagado);$('detail').classList.remove('hidden');$('detail').innerHTML=`<div class="detailhead"><div><span class="folio">${esc(r.folio)}</span><h3 style="margin:5px 0 0">${esc(r.nombre||'Sin nombre')} · ${esc(r.modelo||'')}</h3></div><button class="btn" onclick="document.getElementById('detail').classList.add('hidden')">Cerrar</button></div><div class="detailgrid"><div class="kv"><span>IMEI</span><b>${esc(r.imei)}</b></div><div class="kv"><span>WhatsApp</span><b>${esc(r.whatsapp)}</b></div><div class="kv"><span>Estado</span><b>${esc(r.estado)}</b></div><div class="kv"><span>Precio total</span><b>${money(precio)}</b></div><div class="kv"><span>Total pagado</span><b>${money(totalPagado)}</b></div><div class="kv"><span>Saldo pendiente</span><b>${money(saldo)}</b></div><div class="kv"><span>Deuda mayor a 1 mes</span><b>${r.deuda_mayor_1_mes?'Sí':'No'}</b></div><div class="kv"><span>Estado / ubicación</span><b>${esc(r.estado_ubicacion||r.estado_cliente||'—')}</b></div></div><div style="margin-top:18px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019"><div style="font-weight:900;margin-bottom:10px">Control de pagos</div><div class="detailgrid" style="margin-top:0"><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">ANTICIPO PAGADO</label><input id="payAdvance" type="number" min="0" step="1" value="${anticipoBase}"></div><div><label style="display:block;color:#8fa6b6;font-size:9px;margin-bottom:5px">PAGO FINAL</label><input id="payFinal" type="number" min="0" step="1" value="${finalPagado}"></div></div><div class="actions"><button class="btn primary" onclick="savePayments()">Guardar pagos</button><span id="payMsg" style="align-self:center;color:#7dffb5;font-size:11px"></span></div></div><div id="paymentFlow" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019">
+<div style="font-weight:900;margin-bottom:8px">Flujo de pago</div>
+<div id="paymentFlowText" style="color:#8fa6b6;font-size:10px;line-height:1.6">Calculando saldo…</div>
+</div>
+<div id="quickActions" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019">
 <div style="font-weight:900;margin-bottom:6px">Acciones de comunicación</div>
 <div style="color:#8fa6b6;font-size:10px;line-height:1.5;margin-bottom:10px">Selecciona una acción para preparar el mensaje exacto correspondiente a la etapa actual del servicio.</div>
 <div class="actions" style="margin-top:0">
@@ -21,7 +25,21 @@ window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=
 <button class="btn" id="waAction2" onclick="openQuickWhatsApp(2)">WhatsApp · seguimiento</button>
 </div>
 <div id="waActionNote" style="margin-top:9px;color:#8fa6b6;font-size:10px"></div>
-</div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'});updateQuickActions()};
+</div><div class="actions"><select id="newStatus">${STATUSES.map(s=>`<option ${s===r.estado?'selected':''}>${s}</option>`).join('')}</select><button class="btn primary" onclick="saveStatus()">Guardar estado</button>${r.whatsapp?`<button class="btn" onclick="openWhatsAppMessage()">WhatsApp · enviar actualización</button><button class="btn" onclick="window.open('https://wa.me/52${String(r.whatsapp).replace(/\D/g,'')}', '_blank')">Abrir WhatsApp</button>`:''}</div><div id="waPreview" style="margin-top:12px;color:#8fa6b6;font-size:10px;line-height:1.5"></div>`;$('detail').scrollIntoView({behavior:'smooth',block:'start'});
+const precioFlow=Number(r.precio)||0;
+const advanceFlow=Number(r.anticipo_pagado ?? r.anticipo)||0;
+const finalFlow=Number(r.pago_final)||0;
+const totalFlow=Number(r.total_pagado ?? (advanceFlow+finalFlow))||0;
+const saldoFlow=Math.max(0,precioFlow-totalFlow);
+const pf=document.getElementById('paymentFlowText');
+if(pf){
+  if(saldoFlow>0){
+    pf.innerHTML='<b style="color:#ffcf70">Saldo pendiente: '+money(saldoFlow)+'</b><br>El servicio puede solicitar el pago final por WhatsApp cuando corresponda.';
+  }else{
+    pf.innerHTML='<b style="color:#7dffb5">Servicio liquidado · saldo $0</b><br>El expediente está listo para concluir administrativamente cuando corresponda.';
+  }
+}
+updateQuickActions()};
 
 function buildWhatsAppMessage(){
   if(!selected) return '';
@@ -97,12 +115,35 @@ function updateQuickActions(){
   const a=quickActionData();
   if(!a) return;
   const b1=document.getElementById('waAction1'), b2=document.getElementById('waAction2'), note=document.getElementById('waActionNote');
+  const precio=Number(selected.precio)||0;
+  const advance=Number(selected.anticipo_pagado ?? selected.anticipo)||0;
+  const finalPay=Number(selected.pago_final)||0;
+  const total=Number(selected.total_pagado ?? (advance+finalPay))||0;
+  const saldo=Math.max(0,precio-total);
   if(b1){b1.textContent='WhatsApp · '+a[0][0];}
-  if(b2){b2.textContent='WhatsApp · '+a[1][0];}
-  if(note){note.textContent='Estado actual: '+(selected.estado||'Solicitud recibida')+' · Los importes se toman directamente del registro.';}
+  if(b2){
+    b2.textContent='WhatsApp · '+a[1][0];
+    const noPaymentNeeded=['Liberado','Pago final'].includes(selected.estado) && saldo<=0;
+    b2.disabled=noPaymentNeeded;
+    b2.style.opacity=noPaymentNeeded?'0.45':'1';
+    b2.title=noPaymentNeeded?'No existe saldo pendiente.':'';
+  }
+  if(note){
+    note.textContent='Estado actual: '+(selected.estado||'Solicitud recibida')+
+      ' · Total: '+money(precio)+' · Pagado: '+money(total)+' · Saldo: '+money(saldo);
+  }
 }
 window.openQuickWhatsApp=(which)=>{
   if(!selected||!selected.whatsapp)return;
+  const precio=Number(selected.precio)||0;
+  const advance=Number(selected.anticipo_pagado ?? selected.anticipo)||0;
+  const finalPay=Number(selected.pago_final)||0;
+  const total=Number(selected.total_pagado ?? (advance+finalPay))||0;
+  const saldo=Math.max(0,precio-total);
+  if((selected.estado==='Liberado'||selected.estado==='Pago final') && saldo<=0){
+    alert('No hay saldo pendiente. El servicio ya está liquidado.');
+    return;
+  }
   const a=quickActionData();
   const item=a && a[which-1];
   if(!item)return;
