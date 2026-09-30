@@ -86,7 +86,7 @@ function renderClientDirectory(){
 
   const clients=[...map.values()].map(c=>{
     const billed=c.rows.reduce((s,r)=>s+(Number(r.precio)||0),0);
-    const paid=c.rows.reduce((s,r)=>s+(Number(r.total_pagado ?? ((Number(r.anticipo_pagado ?? r.anticipo)||0)+(Number(r.pago_final)||0)))||0,0);
+    const paid=c.rows.reduce((s,r)=>s+(Number(r.total_pagado ?? ((Number(r.anticipo_pagado ?? r.anticipo)||0)+(Number(r.pago_final)||0)))||0),0);
     const pending=Math.max(billed-paid,0);
     const latest=c.rows.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0];
     return {...c,billed,paid,pending,latest};
@@ -213,7 +213,7 @@ function renderClientSummary(r){
     return (phone && xp===phone) || (!phone && name && xn===name);
   });
   const total=hs.reduce((s,x)=>s+(Number(x.precio)||0),0);
-  const paid=hs.reduce((s,x)=>s+(Number(x.total_pagado ?? ((Number(x.anticipo_pagado ?? x.anticipo)||0)+(Number(x.pago_final)||0)))||0,0);
+  const paid=hs.reduce((s,x)=>s+(Number(x.total_pagado ?? ((Number(x.anticipo_pagado ?? x.anticipo)||0)+(Number(x.pago_final)||0)))||0),0);
   const pending=hs.reduce((s,x)=>s+Math.max((Number(x.precio)||0)-(Number(x.total_pagado ?? ((Number(x.anticipo_pagado ?? x.anticipo)||0)+(Number(x.pago_final)||0)))||0),0),0);
   const el=document.createElement('div');
   el.style.marginBottom='12px';
