@@ -17,6 +17,7 @@ window.openDetail=id=>{const r=findRow(id);if(!r)return;selected=r;const precio=
 <div style="font-weight:900;margin-bottom:8px">Flujo de pago</div>
 <div id="paymentFlowText" style="color:#8fa6b6;font-size:10px;line-height:1.6">Calculando saldo…</div>
 </div>
+<div id="closureActions" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019"></div>
 <div id="quickActions" style="margin-top:14px;padding:15px;border:1px solid #1d394b;border-radius:14px;background:#061019">
 <div style="font-weight:900;margin-bottom:6px">Acciones de comunicación</div>
 <div style="color:#8fa6b6;font-size:10px;line-height:1.5;margin-bottom:10px">Selecciona una acción para preparar el mensaje exacto correspondiente a la etapa actual del servicio.</div>
@@ -132,6 +133,14 @@ function updateQuickActions(){
     note.textContent='Estado actual: '+(selected.estado||'Solicitud recibida')+
       ' · Total: '+money(precio)+' · Pagado: '+money(total)+' · Saldo: '+money(saldo);
   }
+  const closure=document.getElementById('closureActions');
+  if(closure){
+    if(selected.estado==='Terminado'){
+      closure.innerHTML='<div style="font-weight:900;margin-bottom:6px">Cierre del servicio</div><div style="color:#8fa6b6;font-size:10px;line-height:1.5;margin-bottom:10px">El expediente está terminado y liquidado. Puedes enviar la confirmación final o solicitar una recomendación.</div><div class="actions" style="margin-top:0"><button class="btn primary" onclick="openClosureWhatsApp(1)">WhatsApp · confirmar término</button><button class="btn" onclick="openClosureWhatsApp(2)">WhatsApp · solicitar recomendación</button></div>';
+    }else{
+      closure.innerHTML='';
+    }
+  }
   const ca=document.getElementById('completionAction');
   if(ca){
     if(saldo===0 && selected.estado!=='Terminado'){
@@ -161,6 +170,34 @@ window.openQuickWhatsApp=(which)=>{
   if(phone.startsWith('52') && phone.length===12) phone=phone.slice(2);
   if(phone.length!==10){alert('El número de WhatsApp no parece tener 10 dígitos. Verifícalo antes de enviar el mensaje.');return;}
   window.open('https://wa.me/52'+phone+'?text='+encodeURIComponent(item[1]),'_blank');
+};
+
+
+window.openClosureWhatsApp=(type)=>{
+  if(!selected||!selected.whatsapp)return;
+  if(selected.estado!=='Terminado'){
+    alert('El mensaje de cierre solo está disponible cuando el servicio está marcado como Terminado.');
+    return;
+  }
+  const nombre=(selected.nombre||'cliente').trim().split(/\s+/)[0];
+  const folio=selected.folio||'—';
+  const modelo=selected.modelo||'iPhone';
+  const precio=Number(selected.precio)||0;
+  const total=Number(selected.total_pagado ?? ((Number(selected.anticipo_pagado ?? selected.anticipo)||0)+(Number(selected.pago_final)||0)))||0;
+  const saldo=Math.max(0,precio-total);
+  let msg='';
+  if(type===1){
+    msg=`Hola ${nombre}, te contactamos de APPLEX.\n\nConfirmamos que tu servicio de liberación para el ${modelo} ha sido concluido correctamente.\n\nFolio: ${folio}\nImporte total: ${money(precio)}\nTotal pagado: ${money(total)}\nSaldo pendiente: ${money(saldo)}\n\nGracias por confiar en APPLEX. Agradecemos tu preferencia y quedamos a tus órdenes para cualquier asistencia adicional.\n\nAPPLEX`;
+  }else{
+    msg=`Hola ${nombre}, te contactamos de APPLEX.\n\nTu servicio de liberación para el ${modelo} ha sido concluido correctamente.\n\nFolio: ${folio}\n\nGracias por confiar en APPLEX. Si tu experiencia con nosotros fue satisfactoria, agradeceremos mucho que nos recomiendes con familiares o amigos que necesiten un servicio similar.\n\nAPPLEX`;
+  }
+  let phone=String(selected.whatsapp).replace(/\D/g,'');
+  if(phone.startsWith('52') && phone.length===12) phone=phone.slice(2);
+  if(phone.length!==10){
+    alert('El número de WhatsApp no parece tener 10 dígitos. Verifícalo antes de enviar el mensaje.');
+    return;
+  }
+  window.open('https://wa.me/52'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
 
 window.openWhatsAppMessage=()=>{
