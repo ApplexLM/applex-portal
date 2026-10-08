@@ -219,6 +219,41 @@ img, video, canvas, svg{
   }
 }
 
+
+/* APPLEX — GARANTÍA DE POR VIDA */
+.warranty{
+  margin-top:16px;
+  padding:24px 26px;
+  display:flex;
+  align-items:flex-start;
+  gap:20px;
+  background:linear-gradient(145deg,rgba(7,22,34,.94),rgba(2,8,13,.96));
+  border-color:rgba(39,202,255,.28);
+}
+.warranty-icon{
+  width:52px;height:52px;min-width:52px;
+  display:grid;place-items:center;
+  border:1px solid rgba(39,202,255,.45);
+  border-radius:15px;
+  background:rgba(8,186,255,.08);
+  font-size:25px;
+  box-shadow:0 0 24px rgba(8,186,255,.12);
+}
+.warranty-content{min-width:0}
+.warranty-eyebrow{color:#27caff;font-size:10px;font-weight:850;letter-spacing:2px}
+.warranty h3{margin:5px 0;font-size:22px;letter-spacing:.2px}
+.warranty-lead{color:#eef8fd!important;font-size:14px!important;font-weight:800;margin:0 0 8px!important}
+.warranty p{color:#91a8b7;font-size:11px;line-height:1.6;margin:7px 0;max-width:900px}
+.warranty-points{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin-top:14px}
+.warranty-points span{color:#cfe0e9;font-size:10px;font-weight:750}
+.warranty-signature{margin-top:16px;color:#27caff;font-size:10px;font-weight:850;letter-spacing:.2px}
+@media(max-width:720px){
+  .warranty{padding:20px 17px;gap:14px}
+  .warranty-icon{width:44px;height:44px;min-width:44px;font-size:21px}
+  .warranty h3{font-size:18px}
+  .warranty-points{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -282,7 +317,7 @@ img, video, canvas, svg{
     <label>Nombre completo</label><input id="name" placeholder="Tu nombre">
     <label>Número de WhatsApp</label><input id="wa" inputmode="numeric" maxlength="10" placeholder="10 dígitos">
     <label>Estado</label><select id="state"><option value="">Selecciona tu estado</option><option>Sinaloa</option><option>Sonora</option><option>Chihuahua</option><option>Jalisco</option><option>Ciudad de México</option><option>Nuevo León</option><option>Otro estado</option></select>
-    <div class="quote"><small>COTIZACIÓN ESTIMADA</small><div class="price" id="price">$3,200 MXN</div><div class="qrow"><span>Precio del servicio</span><strong id="service">$3,200 MXN</strong></div><div class="qrow"><span>Anticipo (50%)</span><strong id="deposit">$1,600 MXN</strong></div><div class="qrow"><span>Resto al finalizar</span><strong id="balance">$1,600 MXN</strong></div><div class="notice">La cotización se calcula según el modelo y la información proporcionada. Te confirmaremos los detalles por WhatsApp.</div></div>
+    <div class="quote"><small>COTIZACIÓN ESTIMADA</small><div class="price" id="price">$3,200 MXN</div><div class="qrow"><span>Precio del servicio</span><strong id="service">$3,200 MXN</strong></div><div class="notice">La cotización se calcula según el modelo y la información proporcionada. Te confirmaremos los detalles por WhatsApp.</div></div>
     <button class="btn" id="send" type="button" onclick="window.APPLEX_ENVIAR()">ENVIAR SOLICITUD &nbsp; →</button><div class="secure">🔒 Tus datos se utilizan para gestionar tu solicitud.</div>
   </div>
 </section>
@@ -295,6 +330,25 @@ img, video, canvas, svg{
 <div class="howcard"><div class="hownum">2</div><div><b>REVISAMOS TU EQUIPO</b><p>Validamos la información y confirmamos la cotización.</p></div></div>
 <div class="howcard"><div class="hownum">3</div><div><b>TE CONTACTAMOS</b><p>Recibes seguimiento por WhatsApp hasta completar el servicio.</p></div></div>
 </div></section>
+
+
+<section class="panel warranty" aria-label="Garantía de por vida">
+  <div class="warranty-icon">🛡️</div>
+  <div class="warranty-content">
+    <div class="warranty-eyebrow">RESPALDO APPLEX</div>
+    <h3>GARANTÍA DE POR VIDA</h3>
+    <p class="warranty-lead">Tu liberación está respaldada de por vida.</p>
+    <p>En APPLEX respaldamos nuestros servicios de liberación para equipos AT&T México con garantía de por vida, sin importar el tipo de servicio realizado.</p>
+    <p>Una vez completada la liberación, nuestro compromiso es respaldar el servicio realizado y brindarte atención en caso de cualquier situación relacionada directamente con la liberación de tu equipo.</p>
+    <div class="warranty-points">
+      <span>✓ Garantía de por vida</span>
+      <span>✓ Aplicable a servicios AT&T México</span>
+      <span>✓ Respaldo directo de APPLEX</span>
+      <span>✓ Atención y seguimiento posterior al servicio</span>
+    </div>
+    <div class="warranty-signature">APPLEX — Liberamos tu iPhone. Respaldamos nuestro trabajo.</div>
+  </div>
+</section>
 
 <footer class="panel footer" id="contacto">
 <div class="foot"><b>📍 ANGEL FLORES 223</b><span>Contra esquina de JAPAMA<br>Los Mochis, Sinaloa</span></div>
@@ -546,7 +600,7 @@ $("send").addEventListener("click",async function(e){
  try{
   const r=await fetch(SUPA+"/rest/v1/solicitudes",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(data)});
   if(!r.ok){const t=await r.text();throw new Error(t||"Supabase rechazó la solicitud.");}
-  const msg=`Hola APPLEX 👋\n\nQuiero solicitar la liberación de mi iPhone.\n\nFolio: ${folio}\nModelo: ${m}\nIMEI: ${imei}\nNombre: ${name}\nWhatsApp: ${wa}\nCotización: ${money(price)}\nAnticipo (50%): ${money(price/2)}`;
+  const msg=`Hola APPLEX 👋\n\nQuiero solicitar la liberación de mi iPhone.\n\nFolio: ${folio}\nModelo: ${m}\nIMEI: ${imei}\nNombre: ${name}\nWhatsApp: ${wa}\nCotización: ${money(price)}\n`;
   window.location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
  }catch(err){toast("No se pudo guardar: "+err.message);}finally{btn.disabled=false;btn.textContent=old;}
 });
