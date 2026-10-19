@@ -158,17 +158,11 @@ function renderClientDirectory(){
 function renderBusinessDashboard(){
   const total=rows.length;
   const sales=rows.reduce((sum,r)=>sum+(Number(r.precio)||0),0);
-  // Cobrado: solicitudes terminadas y completamente pagadas.
+  // Cobrado: suma el precio total de las solicitudes en estado Terminado.
   const collected=rows
     .filter(r=>r.estado==='Terminado')
-    .reduce((sum,r)=>{
-      const precio=Number(r.precio)||0;
-      const a=Number(r.anticipo_pagado ?? r.anticipo)||0;
-      const f=Number(r.pago_final)||0;
-      const t=r.total_pagado!=null?Number(r.total_pagado)||0:a+f;
-      return sum+(t>=precio ? precio : 0);
-    },0);
-  // Por cobrar: saldo pendiente solo de solicitudes activas.
+    .reduce((sum,r)=>sum+(Number(r.precio)||0),0);
+  // Por cobrar: saldo pendiente de las solicitudes que siguen activas.
   const pending=rows
     .filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado))
     .reduce((sum,r)=>{
