@@ -159,10 +159,12 @@ function renderBusinessDashboard(){
   const total=rows.length;
   const sales=rows.reduce((sum,r)=>sum+(Number(r.precio)||0),0);
   const collected=rows.reduce((sum,r)=>{
-    const a=Number(r.anticipo_pagado ?? r.anticipo)||0;
-    const f=Number(r.pago_final)||0;
-    const t=r.total_pagado!=null?Number(r.total_pagado)||0:a+f;
-    return sum+t;
+    const anticipoPagado=Number(r.anticipo_pagado)||0;
+    const pagoFinal=Number(r.pago_final)||0;
+    const totalPagado=r.total_pagado!=null
+      ? Number(r.total_pagado)||0
+      : anticipoPagado+pagoFinal;
+    return sum+totalPagado;
   },0);
   const pending=rows
     .filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado))
