@@ -164,13 +164,15 @@ function renderBusinessDashboard(){
     const t=r.total_pagado!=null?Number(r.total_pagado)||0:a+f;
     return sum+t;
   },0);
-  const pending=rows.reduce((sum,r)=>{
-    const precio=Number(r.precio)||0;
-    const a=Number(r.anticipo_pagado ?? r.anticipo)||0;
-    const f=Number(r.pago_final)||0;
-    const t=r.total_pagado!=null?Number(r.total_pagado)||0:a+f;
-    return sum+Math.max(0,precio-t);
-  },0);
+  const pending=rows
+    .filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado))
+    .reduce((sum,r)=>{
+      const precio=Number(r.precio)||0;
+      const pagado=r.total_pagado!=null
+        ? Number(r.total_pagado)||0
+        : (Number(r.anticipo_pagado)||0)+(Number(r.pago_final)||0);
+      return sum+Math.max(0,precio-pagado);
+    },0);
   const ticket=total?sales/total:0;
   const done=rows.filter(r=>r.estado==='Terminado').length;
   const active=rows.filter(r=>['Anticipo recibido','En proceso','Liberado','Pago final'].includes(r.estado)).length;
